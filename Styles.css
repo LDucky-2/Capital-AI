@@ -1,0 +1,208 @@
+/* ========================================================= */
+/* 1. GLOBAL & RESET STYLES */
+/* ========================================================= */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-color: #f8f9fa;
+}
+
+/* ========================================================= */
+/* 2. VERTICAL NAVBAR STYLING */
+/* ========================================================= */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px; 
+    height: 100%;
+    background-color: #212529; 
+    color: white; 
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.15); 
+    padding-top: 40px; 
+}
+
+.navbar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar a {
+    display: block;
+    color: #ced4da;
+    padding: 18px 25px; 
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border-left: 5px solid transparent; 
+    transition: all 0.3s ease;
+}
+
+.navbar a:hover:not(.active) {
+    background-color: #343a40; 
+    color: white; 
+    border-left: 5px solid #495057; 
+}
+
+.navbar a.active {
+    background-color: #007bff; 
+    color: white;
+    font-weight: 700;
+    border-left: 5px solid #0056b3; 
+}
+
+
+/* ========================================================= */
+/* 3. MAIN CONTENT AREA STYLING (For index.html) */
+/* ========================================================= */
+.content {
+    /* Pushes content away from the fixed navbar */
+    margin-left: 240px; 
+    padding: 30px;
+    max-width: 1000px;
+    line-height: 1.6;
+}
+
+.content h1 {
+    color: #343a40;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+.content h2 {
+    color: #495057;
+    padding-top: 60px; 
+    margin-top: -60px;
+    margin-bottom: 15px;
+}
+
+
+/* ========================================================= */
+/* 4. LOGIN FORM STYLING (Applies to login.html) */
+/* ========================================================= */
+
+/* Centering Styles for the standalone Login Page */
+.login-page {
+    /* Overrides the default body style for centering */
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #e9ecef; /* Slightly darker background for focus */
+}
+
+.login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+    width: 100%;
+    max-width: 400px; 
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 30px;
+    color: #343a40;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    box-sizing: border-box; 
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: #007bff; 
+    outline: none; 
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff; 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+.signup-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff; 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #0056b3; 
+}
+.signup-button:hover {
+    background-color: #0056b3; 
+}
+
+.options {
+    margin-top: 25px;
+    font-size: 14px;
+}
+
+.options a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.options a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.options span {
+    color: #6c757d;
+    margin: 0 10px;
+}
+
+.back-link {
+    margin-top: 25px;
+}
+.back-link a {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 14px;
+}
+.back-link a:hover {
+    color: #343a40;
+    text-decoration: underline;
+}
