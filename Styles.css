@@ -261,23 +261,6 @@ body {
     border-bottom: 2px solid #007bff; /* Thicker line at the bottom */
 }
 
-/* Custom styling for the Status column for visual feedback */
-.data-table td:last-child {
-    font-weight: 500;
-}
-
-.data-table tr:nth-child(2) td:last-child { /* New Users row */
-    color: #28a745; /* Green for success */
-}
-.data-table tr:nth-child(3) td:last-child { /* Revenue row */
-    color: #ffc107; /* Yellow for caution */
-}
-.data-table tr:nth-child(4) td:last-child { /* Conversion Rate row */
-    color: #28a745; /* Green for success */
-}
-.data-table tr:nth-child(5) td:last-child { /* Support Tickets row */
-    color: #dc3545; /* Red for warning */
-}
 /* ========================================================= */
 /* 6. TOP TITLE (HERO) AREA STYLING */
 /* ========================================================= */
@@ -318,7 +301,7 @@ body {
     z-index: 1000; 
 
     /* Styling */
-    background-color: #3498db; /* Blue color */
+    background-color: #000000; /* Blue color */
     color: #ffffff;
     padding: 0 30px; 
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
