@@ -63,7 +63,7 @@ body {
 .content {
     /* Offset from navbar (240px) PLUS header (70px) */
     margin-left: 240px; 
-    margin-top: 70px; /* Shift content down below the fixed top header */
+    margin-top: 20px; /* Shift content down below the fixed top header */
     padding: 30px;
     /* ... rest of the content styles ... */
 }
@@ -78,14 +78,13 @@ body {
 
 .content h2 {
     color: #495057;
-    padding-top: 60px; 
-    margin-top: -60px;
+    padding-top: 15px; 
     margin-bottom: 15px;
 }
 
 
 /* ========================================================= */
-/* 4. LOGIN FORM STYLING (Applies to login.html) */
+/* 4. LOGIN FORM STYLING (Applies to login.php) */
 /* ========================================================= */
 
 /* Centering Styles for the standalone Login Page */
@@ -215,32 +214,63 @@ body {
 /* ========================================================= */
 .data-table {
     width: 100%;
-    border-collapse: collapse; /* Removes the space between borders */
+    border-collapse: collapse; 
     margin: 25px 0;
     font-size: 1em;
     min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); /* Subtle shadow for lift */
-    border-radius: 8px; /* Rounded corners for the entire table */
-    overflow: hidden; /* Ensures borders/shadows apply correctly with rounded corners */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); 
+    border-radius: 8px; 
+    overflow: hidden; 
 }
 
-/* Table Header Styles */
+/* --- Fixed Header and Scrollable Body --- */
+
+/* Wrapper to define the total height of the scrollable section */
+.data-table-scroll-wrapper {
+    max-height: 400px; 
+    overflow-y: auto;
+    width: 100%;
+    margin-bottom: 25px; 
+    
+    /* === ADD THESE LINES FOR THE BORDER === */
+    border: 1px solid #ced4da; /* Light gray border around the whole table/wrapper */
+    border-radius: 8px; /* Apply the border radius to the wrapper */
+    /* ======================================= */
+    
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); 
+}
+
+/* Ensure the table itself stretches inside the wrapper */
+.data-table {
+    width: 100%;
+    margin: 0; 
+    box-shadow: none; 
+    border-radius: 0;
+    
+    /* Set borders to be inside the collapsed table */
+    /* This ensures that the outer border defined on the wrapper is the only full border visible */
+    border: none; 
+}
+
+
+/* Table Header Styles - Must be defined separately if using complex scrollable techniques */
 .data-table thead tr {
-    background-color: #007bff; /* Primary blue background for header */
+    background-color: #007bff; 
     color: #ffffff;
     text-align: left;
     font-weight: 600;
 }
 
-/* Header and Data Cell Padding */
+/* Header and Data Cell Padding (Keep these) */
 .data-table th, 
 .data-table td {
     padding: 12px 15px;
+    /* Ensure all cells have the same box-sizing */
+    box-sizing: border-box; 
 }
-
 /* Table Body Row Styling */
 .data-table tbody tr {
-    border-bottom: 1px solid #dddddd; /* Light separator line */
+    border-bottom: 1px solid #dddddd; /* Keep the row separator line */
     background-color: #ffffff;
 }
 
