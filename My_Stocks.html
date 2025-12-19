@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unified Admin Dashboard</title>
-    <link rel="stylesheet" href="Styles.css">
-</head>
-<body>
+<?php
+include 'auth_session.php';
+checkLogin();
+include 'Database.php';
 
+<<<<<<< Updated upstream:My_Stocks.html
     <div class="navbar">
         <ul>
             <li><a href="Audits.html">Audit Reports</a></li>
@@ -28,59 +24,108 @@
             <!-- <li><a href="Log_in.html">Log In Page</a></li> -->
         </ul>
     </div>
+=======
+$user_id = $_SESSION['User_ID'];
+$role = $_SESSION['Permission'];
+$stocks_data = [];
+$mode = "";
+>>>>>>> Stashed changes:My_Stocks.php
 
-    <div class = "content">
-        <header class="top-brand-header">
-            <div class="logo-wrap">
-                <img src="images/Skyrim_Logo.png" alt="Brand Logo" class="brand-logo"> 
-                <div class="brand-text-wrap">
-                    <span class="brand-name">Financial Institutions Management</span>
-                </div>
-            </div>
-        </header>
+if ($role === 'Company') {
+    $mode = "issued";
+    $sql = "SELECT Stock_ID, Total_Shares, Current_Price FROM Stock_T WHERE Company_User_ID = '$user_id'";
+    $result = $conn->query($sql);
+} elseif ($role === 'Investor') {
+    $mode = "portfolio";
+    // Aggregate portfolio
+    $sql = "
+        SELECT 
+            t.Stock_ID,
+            s.Current_Price,
+            c_user.Name as Company_Name,
+            SUM(CASE WHEN t.Transaction_Type = 'buy' THEN t.Share_Amount ELSE 0 END) - 
+            SUM(CASE WHEN t.Transaction_Type = 'sell' THEN t.Share_Amount ELSE 0 END) as Net_Shares
+        FROM Stock_Transactions_T t
+        JOIN Stock_T s ON t.Stock_ID = s.Stock_ID
+        JOIN Company_T c ON s.Company_User_ID = c.Company_User_ID
+        JOIN User_T c_user ON c.Company_User_ID = c_user.User_ID
+        WHERE t.Investor_User_ID = '$user_id'
+        GROUP BY t.Stock_ID, s.Current_Price, c_user.Name
+        HAVING Net_Shares > 0
+    ";
+    $result = $conn->query($sql);
+} else {
+    $mode = "none";
+    $result = null;
+}
+?>
 
-        <h2 id="summary">My Stocks</h2>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Stock ID</th>
-                    <th>Company Name</th>
-                    <th>Shares Held</th>
-                    <th>Share Value</th>
-                    <th>Total Increment</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>New Users</td>
-                    <td>500</td>
-                    <td>550</td>
-                    <td>Achieved</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Revenue (k)</td>
-                    <td>$250</td>
-                    <td>$245</td>
-                    <td>Near Target</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Conversion Rate</td>
-                    <td>3.5%</td>
-                    <td>3.8%</td>
-                    <td>Achieved</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Support Tickets</td>
-                    <td>50</td>
-                    <td>65</td>
-                    <td>Over Target</td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/sidebar.php'; ?>
+
+<div class="page-header">
+    <h2>My Portfolio</h2>
+</div>
+
+<?php
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] == 'sold') echo "<div class='alert'>Stock sold successfully!</div>";
+}
+?>
+
+<div class="data-table-scroll-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Stock ID</th>
+                <?php if ($mode == 'portfolio'): ?>
+                <th>Company Name</th>
+                <th>Net Shares Owned</th>
+                <?php elseif ($mode == 'issued'): ?>
+                <th>Total Shares Issued</th>
+                <?php endif; ?>
+                <th>Current Price</th>
+                <th>Total Value</th>
+                <?php if ($mode == 'portfolio') echo "<th>Action</th>"; ?>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if ($result && $result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($row['Stock_ID']) . "</td>";
+                    
+                    if ($mode == 'portfolio') {
+                         echo "<td>" . htmlspecialchars($row['Company_Name']) . "</td>";
+                         echo "<td>" . htmlspecialchars($row['Net_Shares']) . "</td>";
+                         echo "<td>$" . htmlspecialchars($row['Current_Price']) . "</td>";
+                         echo "<td>$" . number_format($row['Net_Shares'] * $row['Current_Price'], 2) . "</td>";
+                         
+                         // Sell Form
+                         echo "<td>";
+                         echo "<form action='stock_action.php' method='POST' style='display:inline-flex; gap:5px;'>";
+                         echo "<input type='hidden' name='stock_id' value='" . $row['Stock_ID'] . "'>";
+                         echo "<input type='hidden' name='action' value='sell'>";
+                         echo "<input type='number' name='amount' placeholder='Qty' min='1' max='" . $row['Net_Shares'] . "' style='width:60px; padding:5px; margin:0; background:#111; border:1px solid #333; color:#fff;' required>";
+                         echo "<button type='submit' class='btn-action' style='background-color:#c0392b; color:white; border-color:#c0392b;'>SELL</button>";
+                         echo "</form>";
+                         echo "</td>";
+                         
+                    } elseif ($mode == 'issued') {
+                         echo "<td>" . htmlspecialchars($row['Total_Shares']) . "</td>";
+                         echo "<td>$" . htmlspecialchars($row['Current_Price']) . "</td>";
+                         echo "<td>$" . number_format($row['Total_Shares'] * $row['Current_Price'], 2) . "</td>";
+                    }
+                    
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='6' style='text-align:center;'>No active stocks in portfolio.</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+<?php include 'includes/footer.php'; ?>

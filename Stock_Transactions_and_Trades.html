@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unified Admin Dashboard</title>
-    <link rel="stylesheet" href="Styles.css">
-</head>
-<body>
+<?php
+include 'auth_session.php';
+checkLogin();
+include 'Database.php';
 
+<<<<<<< Updated upstream:Stock_Transactions_and_Trades.html
     <div class="navbar">
         <ul>
             <li><a href="Audits.html">Audit Reports</a></li>
@@ -28,60 +24,122 @@
             <!-- <li><a href="Log_in.html">Log In Page</a></li> -->
         </ul>
     </div>
+=======
+// Fetch Stock Transactions (Investors buying/selling stocks)
+$sql_stock_trans = "
+    SELECT 
+        t.Transaction_ID,
+        t.Stock_ID,
+        u.Name as Investor_Name,
+        t.Share_Amount,
+        t.Transaction_Type
+    FROM Stock_Transactions_T t
+    JOIN User_T u ON t.Investor_User_ID = u.User_ID";
+>>>>>>> Stashed changes:Stock_Transactions_and_Trades.php
 
-    <div class = "content">
-        <header class="top-brand-header">
-            <div class="logo-wrap">
-                <img src="images/Skyrim_Logo.png" alt="Brand Logo" class="brand-logo"> 
-                <div class="brand-text-wrap">
-                    <span class="brand-name">Financial Institutions Management</span>
-                </div>
-            </div>
-        </header>
+// Filter for Investor Role
+if (hasRole('Investor')) {
+    $investor_id = $_SESSION['User_ID'];
+    $sql_stock_trans .= " WHERE t.Investor_User_ID = '$investor_id'";
+}
 
-        <h2 id="summary">📊 Data Summary</h2>
+$sql_stock_trans .= " ORDER BY t.Transaction_ID DESC";
+
+$Stock_Transactions = $conn->query($sql_stock_trans);
+
+// Fetch Institution Trades
+// Trade_T: Buyer_Institution_ID, Seller_Institution_ID
+$sql_trades = "
+    SELECT 
+        t.Trade_ID,
+        b_user.Name as Buyer_Name,
+        s_user.Name as Seller_Name,
+        t.Asset_Type,
+        t.Trade_Details
+    FROM Trade_T t
+    JOIN User_T b_user ON t.Buyer_Institution_ID = b_user.User_ID
+    JOIN User_T s_user ON t.Seller_Institution_ID = s_user.User_ID
+    ORDER BY t.Trade_ID DESC
+";
+$Trades = $conn->query($sql_trades);
+?>
+
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/sidebar.php'; ?>
+
+<div class="page-header">
+    <h2>Transactions & Trades</h2>
+</div>
+
+<div class="content-section" style="margin-bottom: 2rem;">
+    <h3 class="section-title">Stock Transactions (Investors)</h3>
+    <div class="data-table-scroll-wrapper">
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Metric</th>
-                    <th>Q1 Target</th>
-                    <th>Q1 Actual</th>
-                    <th>Status</th>
+                    <th>ID</th>
+                    <th>Stock ID</th>
+                    <th>Investor</th>
+                    <th>Shares</th>
+                    <th>Type</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>New Users</td>
-                    <td>500</td>
-                    <td>550</td>
-                    <td>Achieved</td>
-                </tr>
-                <tr>
-                    <td>Revenue (k)</td>
-                    <td>$250</td>
-                    <td>$245</td>
-                    <td>Near Target</td>
-                </tr>
-                <tr>
-                    <td>Conversion Rate</td>
-                    <td>3.5%</td>
-                    <td>3.8%</td>
-                    <td>Achieved</td>
-                </tr>
-                <tr>
-                    <td>Support Tickets</td>
-                    <td>50</td>
-                    <td>65</td>
-                    <td>Over Target</td>
-                </tr>
+                <?php
+                if ($Stock_Transactions && $Stock_Transactions->num_rows > 0) {
+                    while($row = $Stock_Transactions->fetch_assoc()) {
+                        $type_class = ($row['Transaction_Type'] == 'buy') ? 'text-green-500' : 'text-red-500'; // Add these utility classes later or inline
+                        $color = ($row['Transaction_Type'] == 'buy') ? '#10b981' : '#ef4444';
+                        
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($row['Transaction_ID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Stock_ID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Investor_Name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Share_Amount']) . "</td>";
+                        echo "<td style='color:$color; font-weight:bold; text-transform:uppercase;'>" . htmlspecialchars($row['Transaction_Type']) . "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='5'>No stock transactions found.</td></tr>";
+                }
+                ?>
             </tbody>
         </table>
-
-        <h2 id="services">Services Section</h2>
-        <p>Details about services offered.</p>
-        <h2 id="contact">Contact Section</h2>
-        <p>How to get in touch.</p>
     </div>
+</div>
 
-</body>
-</html>
+<div class="content-section">
+    <h3 class="section-title">Institutional Trades</h3>
+    <div class="data-table-scroll-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Buyer</th>
+                    <th>Seller</th>
+                    <th>Asset</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($Trades && $Trades->num_rows > 0) {
+                    while($row = $Trades->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($row['Trade_ID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Buyer_Name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Seller_Name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Asset_Type']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Trade_Details']) . "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='5'>No institutional trades found.</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<?php include 'includes/footer.php'; ?>

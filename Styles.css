@@ -1,48 +1,47 @@
-/* ========================================================= */
-/* 1. GLOBAL & RESET STYLES */
-/* ========================================================= */
-body {
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap');
+
+:root {
+    /* Luxury Light Palette */
+    --bg-body: #f4f6f5;
+    /* Very light gray/green tint */
+    --bg-card: #ffffff;
+    --bg-header: #000000;
+
+    --primary-dark: #064E3B;
+    /* Deep Emerald for text/headers */
+    --primary-main: #10B981;
+    /* Brighter green for active states/buttons */
+    --primary-accent: #047857;
+    /* Medium green */
+
+    --accent-gold: #b38b2d;
+    /* Darker gold for visibility on white */
+
+    --text-main: #1f2937;
+    /* Dark gray for body text */
+    --text-muted: #6b7280;
+    --text-header: #064E3B;
+
+    --border-color: #e5e7eb;
+
+    --sidebar-width: 250px;
+    --header-height: 60px;
+}
+
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    background-color: #f8f9fa;
-}
-
-/* ========================================================= */
-/* 2. VERTICAL NAVBAR STYLING (UPDATED) */
-/* ========================================================= */
-.navbar {
-    position: fixed;
-    top: 70px; /* Starts 70px from the top */
-    left: 0;
-    width: 220px; 
-    height: calc(100% - 70px); /* Fill the rest of the height */
-    background-color: #212529; 
-    color: white; 
-    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.15); 
-    /* padding-top: 40px;  */
-
-    overflow-y: auto; 
-    /* =================================== */
-}
-
-.navbar ul {
-    list-style-type: none;
     padding: 0;
-    margin: 0;
 }
 
-.navbar a {
-    display: block;
-    color: #ced4da;
-    padding: 18px 25px; 
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    border-left: 5px solid transparent; 
-    transition: all 0.3s ease;
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    line-height: 1.6;
 }
 
+<<<<<<< Updated upstream
 .navbar a:hover:not(.active) {
     background-color: #343a40; 
     color: white; 
@@ -306,33 +305,303 @@ body {
     padding: 0 30px; 
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     
+=======
+/* App Structure */
+.app-container {
+>>>>>>> Stashed changes
     display: flex;
-    align-items: center; 
-    justify-content: flex-start;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+.top-brand-header {
+    height: var(--header-height);
+    background-color: var(--bg-header);
+    border-bottom: 2px solid var(--accent-gold);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .logo-wrap {
     display: flex;
     align-items: center;
-}
-
-.brand-logo {
-    height: 40px; 
-    width: auto;
-    margin-right: 15px;
-}
-
-.brand-text-wrap {
-    display: flex;
-    flex-direction: column;
+    gap: 15px;
 }
 
 .brand-name {
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 1.2;
+    font-family: 'Playfair Display', serif;
+    color: var(--accent-gold);
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: 0;
+    /* Handled by gap in .logo-wrap */
 }
 
-/* * The positioning adjustments for .navbar, .content, and .login-container 
-* remain unchanged as they only rely on the fixed height (70px).
-*/
+.brand-logo {
+    height: 50px;
+    width: 50px;
+    /* Fixed square for circle */
+    border-radius: 50%;
+    /* Circular */
+    object-fit: cover;
+    display: block;
+}
+
+.brand-subtitle {
+    display: none;
+}
+
+.user-profile {
+    color: var(--accent-gold);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.logout-btn {
+    color: var(--accent-gold);
+    margin-left: 15px;
+    text-decoration: none;
+    border: 1px solid var(--accent-gold);
+    padding: 5px 10px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: var(--accent-gold);
+    color: #000;
+}
+
+/* Layout */
+.main-layout {
+    display: flex;
+    margin-top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: #ffffff;
+    border-right: 1px solid var(--border-color);
+    height: 100%;
+    overflow-y: auto;
+}
+
+.nav-menu ul {
+    list-style: none;
+}
+
+.nav-menu li a {
+    display: block;
+    padding: 15px 20px;
+    color: var(--text-main);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.nav-menu li a:hover,
+.nav-menu li a.active {
+    background-color: #ecfdf5;
+    /* Very light green bg */
+    color: var(--primary-dark);
+    border-left: 4px solid var(--accent-gold);
+    padding-left: 16px;
+}
+
+.nav-icon {
+    margin-right: 10px;
+    color: var(--accent-gold);
+    width: 20px;
+    text-align: center;
+}
+
+/* Content */
+.content-area {
+    flex: 1;
+    background-color: var(--bg-body);
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* Typography & Headings */
+h2,
+.page-header h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-dark);
+    border-bottom: 2px solid var(--accent-gold);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+/* Tables */
+.data-table-scroll-wrapper {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background-color: var(--primary-dark);
+    color: #fff;
+    /* White text on dark green header */
+    text-align: left;
+    padding: 12px 15px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.data-table td {
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 15px;
+    color: var(--text-main);
+    font-size: 0.9rem;
+}
+
+.data-table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Cards & Sections */
+.content-section,
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    /* No border radius */
+}
+
+.section-title,
+h3 {
+    color: var(--primary-dark);
+    margin-bottom: 15px;
+    font-weight: 600;
+    border-left: 4px solid var(--accent-gold);
+    padding-left: 10px;
+}
+
+/* Auth Pages */
+.auth-wrapper {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-card {
+    background-color: var(--bg-card);
+    border: 2px solid var(--accent-gold);
+    padding: 40px;
+    width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-title {
+    color: var(--primary-dark);
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+}
+
+.input-group label {
+    display: block;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 12px;
+    background-color: #fff;
+    border: 1px solid #d1d5db;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 2px rgba(6, 78, 59, 0.1);
+}
+
+.btn-primary,
+.login-button {
+    width: 100%;
+    background-color: var(--primary-dark);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-primary:hover,
+.login-button:hover {
+    background-color: var(--primary-accent);
+    color: #fff;
+}
+
+.btn-action {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: var(--primary-dark);
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-right: 5px;
+    border: none;
+}
+
+.btn-action:hover {
+    background-color: var(--primary-accent);
+}
+
+.alert {
+    padding: 10px;
+    background-color: #ecfdf5;
+    border: 1px solid var(--primary-main);
+    margin-bottom: 20px;
+    color: var(--primary-dark);
+    font-size: 0.9rem;
+}

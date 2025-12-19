@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unified Admin Dashboard</title>
-    <link rel="stylesheet" href="Styles.css">
-</head>
-<body>
+<?php
+include 'auth_session.php';
+checkLogin();
+include 'Database.php';
 
+<<<<<<< Updated upstream:My_Institution.html
     <div class="navbar">
         <ul>
             <li><a href="Audits.html">Audit Reports</a></li>
@@ -28,55 +24,51 @@
             <!-- <li><a href="Log_in.html">Log In Page</a></li> -->
         </ul>
     </div>
+=======
+// Logic: Check if user is an Institution
+$user_id = $_SESSION['User_ID'];
+$inst_data = null;
+$message = "";
+>>>>>>> Stashed changes:My_Institution.php
 
-    <div class = "content">
-        <header class="top-brand-header">
-            <div class="logo-wrap">
-                <img src="images/Skyrim_Logo.png" alt="Brand Logo" class="brand-logo"> 
-                <div class="brand-text-wrap">
-                    <span class="brand-name">Financial Institutions Management</span>
-                </div>
+$sql = "SELECT * FROM Institution_T WHERE Institution_User_ID = '$user_id'";
+$result = $conn->query($sql);
+
+if ($result && $result->num_rows > 0) {
+    $inst_data = $result->fetch_assoc();
+} else {
+    $message = "No institution profile found for this account.";
+}
+?>
+
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/sidebar.php'; ?>
+
+<div class="page-header">
+    <h2>My Institution</h2>
+</div>
+
+<div class="content-section">
+    <?php if ($inst_data): ?>
+        <div class="card" style="background: var(--bg-card); padding: 2rem; border-radius: 12px; border: 1px solid var(--border-color); max-width: 600px;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--secondary-color);">Institution Profile</h3>
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
+                <div style="color: var(--text-muted);">License Number:</div>
+                <div><?php echo htmlspecialchars($inst_data['License_Number']); ?></div>
+                
+                <div style="color: var(--text-muted);">Type:</div>
+                <div><?php echo htmlspecialchars($inst_data['Institution_Type']); ?></div>
+                
+                <div style="color: var(--text-muted);">User ID:</div>
+                <div><?php echo htmlspecialchars($inst_data['Institution_User_ID']); ?></div>
             </div>
-        </header>
+        </div>
+    <?php else: ?>
+        <div class="alert alert-danger">
+            <?php echo $message; ?>
+            <p>This page is intended for Institution accounts.</p>
+        </div>
+    <?php endif; ?>
+</div>
 
-        <h2 id="summary">Trade Transactions</h2>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Trade ID</th>
-                    <th>Institution</th>
-                    <th>Asset Type</th>
-                    <th>Trade Details</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>New Users</td>
-                    <td>500</td>
-                    <td>550</td>
-                    <td>Achieved</td>
-                </tr>
-                <tr>
-                    <td>Revenue (k)</td>
-                    <td>$250</td>
-                    <td>$245</td>
-                    <td>Near Target</td>
-                </tr>
-                <tr>
-                    <td>Conversion Rate</td>
-                    <td>3.5%</td>
-                    <td>3.8%</td>
-                    <td>Achieved</td>
-                </tr>
-                <tr>
-                    <td>Support Tickets</td>
-                    <td>50</td>
-                    <td>65</td>
-                    <td>Over Target</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>
