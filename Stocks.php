@@ -3,42 +3,22 @@ include 'auth_session.php';
 checkLogin();
 include 'Database.php';
 
-<<<<<<< Updated upstream:Stocks.html
-    <div class="navbar">
-        <ul>
-            <li><a href="Audits.html">Audit Reports</a></li>
-            <li><a href="Company_Database.html">Company Database</a></li>
-            <li><a href="Employee_Database.html">Employee Database</a></li>
-            <li><a href="Frauds.html">Fraud Alerts</a></li>
-            <li><a href="Investor_Database.html">Investor Database</a></li>
-            <li><a href="Logs.html">All Logs</a></li>
-            <li><a href="My_Company.html">My Company</a></li>
-            <li><a href="My_Institution.html">My Institution</a></li>
-            <li><a href="My_Stocks.html">My Stocks</a></li>
-            <li><a href="Predictions.html">Stock Prediction</a></li>
-            <li><a href="Stock_Transactions_and_Trades.html">Stock Transactions and Trades Database</a></li>
-            <li><a href="Stocks.html" class="active">All Stocks</a></li>
-            <li><a href="Institution_Database.html">Institutions</a></li>
-            <!-- <li><a href="Employee_Database.html">Employee Database</a></li> -->
-            <!-- <li><a href="Employee_Database.html">Employee Database</a></li>  -->
-            <!-- <li><a href="Log_in.html">Log In Page</a></li> -->
-        </ul>
-    </div>
-=======
 // Optimized Query
 $sql = "
     SELECT 
         s.Stock_ID, 
         u.Name as Company_Name, 
         s.Total_Shares, 
-        s.Current_Price 
+        s.Current_Price,
+        (s.Total_Shares - COALESCE(SUM(CASE WHEN t.Transaction_Type = 'buy' THEN t.Share_Amount ELSE -t.Share_Amount END), 0)) as Available_Shares
     FROM Stock_T s 
     JOIN Company_T c ON s.Company_User_ID = c.Company_User_ID 
     JOIN User_T u ON c.Company_User_ID = u.User_ID
+    LEFT JOIN Stock_Transactions_T t ON s.Stock_ID = t.Stock_ID
+    GROUP BY s.Stock_ID
     ORDER BY u.Name ASC
 ";
 $Stocks = $conn->query($sql);
->>>>>>> Stashed changes:Stocks.php
 
 $is_investor = hasRole('Investor');
 ?>
@@ -63,7 +43,7 @@ if (isset($_GET['msg'])) {
             <tr>
                 <th>Stock ID</th>
                 <th>Company Name</th>
-                <th>Total Shares</th>
+                <th>Available Shares</th>
                 <th>Current Price</th>
                 <th>Action</th>
             </tr>
@@ -75,7 +55,7 @@ if (isset($_GET['msg'])) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($row['Stock_ID']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['Company_Name']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['Total_Shares']) . "</td>";
+                    echo "<td>" . number_format($row['Available_Shares']) . "</td>";
                     echo "<td>$" . htmlspecialchars($row['Current_Price']) . "</td>";
                     echo "<td>";
                     echo "<a href='Stock_Details.php?id=" . $row['Stock_ID'] . "' class='btn-action' style='background:transparent; color:var(--text-main); border:1px solid var(--text-main);'>View Info</a> ";

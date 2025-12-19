@@ -27,7 +27,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                      $_SESSION['Name'] = $row['Name'];
                      $_SESSION['Permission'] = $row['Permission'];
                      
-                     header("Location: Audits.php");
+                     if ($row['Permission'] === 'Company') {
+                        header("Location: My_Company.php");
+                     } else {
+                        header("Location: Audits.php");
+                     }
                      exit();
                 } else {
                     $message = "<div class='alert alert-danger'>Account is " . $row['Status'] . ".</div>";

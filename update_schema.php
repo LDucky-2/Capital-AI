@@ -1,19 +1,18 @@
 <?php
 include 'Database.php';
 
-// SQL to add column if it doesn't exist
-$sql = "
-    ALTER TABLE Audit_Report_T 
-    ADD COLUMN Company_User_ID INT(9),
-    ADD CONSTRAINT fk_audit_company 
-    FOREIGN KEY (Company_User_ID) REFERENCES Company_T(Company_User_ID);
-";
+// Add Status column to Stock_T if it doesn't exist
+$sql = "SHOW COLUMNS FROM Stock_T LIKE 'Status'";
+$result = $conn->query($sql);
 
-if ($conn->query($sql) === TRUE) {
-    echo "Table Audit_Report_T altered successfully.";
+if ($result->num_rows == 0) {
+    $sql = "ALTER TABLE Stock_T ADD COLUMN Status VARCHAR(10) DEFAULT 'Open'";
+    if ($conn->query($sql) === TRUE) {
+        echo "Column Status added to Stock_T successfully.";
+    } else {
+        echo "Error adding column: " . $conn->error;
+    }
 } else {
-    echo "Error modifying table: " . $conn->error;
+    echo "Column Status already exists.";
 }
-
-$conn->close();
 ?>
