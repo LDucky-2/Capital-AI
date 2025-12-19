@@ -10,7 +10,7 @@ $Database_Managers = $conn->query($sql);
 $sql = "
 SELECT user_t.User_ID,user_t.Name,user_t.Password,user_t.Email_Address,user_t.Status,auditor_t.Auditing_Firm
 FROM user_t,auditor_t
-WHERE Permission = 'Auditors' AND auditor_t.Auditor_User_ID = user_t.User_ID;
+WHERE Permission = 'Auditors' AND auditor_t.Auditor_User_ID = user_t.User_ID
 ORDER BY user_t.User_ID
 ";
 $Auditors = $conn->query($sql);
@@ -108,7 +108,6 @@ $Management = $conn->query($sql);
                 ?>
                 </tbody>
             </table>
-            <?php $conn->close(); ?>
         </div>
         
 
@@ -144,7 +143,7 @@ $Management = $conn->query($sql);
                 ?>
                 </tbody>
             </table>
-            <?php $conn->close(); ?>
+            
         </div>
 
         <h2 id="summary">Fraud Detectors</h2>
@@ -177,7 +176,7 @@ $Management = $conn->query($sql);
                 ?>
                 </tbody>
             </table>
-            <?php $conn->close(); ?>
+            
         </div>
 
         <h2 id="summary">System Administrators</h2>
@@ -210,7 +209,7 @@ $Management = $conn->query($sql);
                 ?>
                 </tbody>
             </table>
-            <?php $conn->close(); ?>
+            
         </div>
 
         <h2 id="summary">Management</h2>

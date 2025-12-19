@@ -80,6 +80,7 @@ $Institutions = $conn->query($sql);
                 ?>
                 </tbody>
             </table>
+            <?php $conn->close(); ?>
         </div>
     </div>
 </body>

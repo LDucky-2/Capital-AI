@@ -112,6 +112,7 @@ $Fraud_Actions = $conn->query($sql);
                     ?>
                 </tbody>
             </table>
+            <?php $conn->close(); ?>
         </div>
     </div>
 

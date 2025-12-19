@@ -3,7 +3,7 @@
 $sql = "
 SELECT company_t.Company_User_ID, user_t.Name, user_t.Password, user_t.Email_Address, company_t.Registration_Number, company_t.Sector,user_t.Status
 FROM company_t INNER JOIN user_t 
-ON user_t.User_ID = company_t.Company_User_ID;
+ON user_t.User_ID = company_t.Company_User_ID
 ORDER BY company_t.Company_User_ID
 ";
 $Companies = $conn->query($sql);
