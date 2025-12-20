@@ -1,4 +1,5 @@
 # Capital-AI
+see this file (like enter this dont see this from the repository <code> page
 A website made for CSC 401 project
 
 This sucks, doesnt really make a lot of sense but you know, it really sucks
