@@ -29,6 +29,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                      
                      if ($row['Permission'] === 'Company') {
                         header("Location: My_Company.php");
+                     } elseif ($row['Permission'] === 'Investor') {
+                        header("Location: My_Stocks.php");
+                     } elseif ($row['Permission'] === 'Institution') {
+                        header("Location: My_Institution.php");
+                     } elseif ($row['Permission'] === 'Fraud Detector') {
+                        header("Location: Frauds.php");
                      } else {
                         header("Location: Audits.php");
                      }

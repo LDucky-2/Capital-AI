@@ -36,6 +36,7 @@ $Institutions = $conn->query($sql);
                 <th>License Number</th>
                 <th>Type</th>
                 <th>Status</th>
+                <?php if (hasRole('Institution')) echo "<th>Action</th>"; ?>
             </tr>
         </thead>
         <tbody>
@@ -49,6 +50,16 @@ $Institutions = $conn->query($sql);
                     echo "<td>" . htmlspecialchars($row['License_Number']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['Institution_Type']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['Status']) . "</td>";
+                    
+                    if (hasRole('Institution')) {
+                         echo "<td>";
+                         if ($row['Status'] == 'Active' && $row['Institution_User_ID'] != $_SESSION['User_ID']) {
+                             echo "<a href='My_Institution.php?trade_with=" . $row['Institution_User_ID'] . "' class='btn-action'>Trade</a>";
+                         } else {
+                             echo "-";
+                         }
+                         echo "</td>";
+                    }
                     echo "</tr>";
                 }
             } else {

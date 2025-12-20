@@ -254,7 +254,7 @@ h3 {
     background-color: var(--bg-card);
     border: 2px solid var(--accent-gold);
     padding: 40px;
-    width: 400px;
+    width: 500px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
@@ -339,4 +339,13 @@ h3 {
     margin-bottom: 20px;
     color: var(--primary-dark);
     font-size: 0.9rem;
+}
+
+.auth-header .brand-logo {
+    display: block;
+    height: 70px;
+    width: 70px;
+    object-fit: cover;
+    margin: 0 auto 10px auto;
+    border-radius: 50%;
 }

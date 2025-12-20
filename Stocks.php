@@ -15,6 +15,7 @@ $sql = "
     JOIN Company_T c ON s.Company_User_ID = c.Company_User_ID 
     JOIN User_T u ON c.Company_User_ID = u.User_ID
     LEFT JOIN Stock_Transactions_T t ON s.Stock_ID = t.Stock_ID
+    WHERE s.Status = 'Open' AND u.Status = 'Active'
     GROUP BY s.Stock_ID
     ORDER BY u.Name ASC
 ";
@@ -64,7 +65,7 @@ if (isset($_GET['msg'])) {
                         echo "<form action='stock_action.php' method='POST' style='display:inline-flex; gap:5px;'>";
                         echo "<input type='hidden' name='stock_id' value='" . $row['Stock_ID'] . "'>";
                         echo "<input type='hidden' name='action' value='buy'>";
-                        echo "<input type='number' name='amount' placeholder='Qty' min='1' style='width:60px; padding:5px; margin:0; background:#111; border:1px solid #333; color:#fff;' required>";
+                        echo "<input type='number' name='amount' placeholder='Qty' min='1' max='" . $row['Available_Shares'] . "' style='width:60px; padding:5px; margin:0; background:#111; border:1px solid #333; color:#fff;' required>";
                         echo "<button type='submit' class='btn-action'>BUY</button>";
                         echo "</form>";
                     }

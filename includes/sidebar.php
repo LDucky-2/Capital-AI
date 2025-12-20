@@ -11,17 +11,17 @@ $menu_items_config = [
         'permissions' => ['Administrator', 'Auditor', 'Management', 'Fraud Detector']
     ],
     'Stocks.php' => [
-        'label' => 'Browse Stocks', // Renamed for Investor
+        'label' => 'Market', 
         'icon' => 'fas fa-chart-line', 
-        'permissions' => null // All can see market
+        'permissions' => ['Administrator', 'Management', 'Investor', 'Company']
     ],
     'My_Stocks.php' => [
         'label' => 'My Stocks', 
         'icon' => 'fas fa-wallet', 
-        'permissions' => ['Investor', 'Company']
+        'permissions' => ['Administrator', 'Management', 'Investor', 'Auditor']
     ],
     'Stock_Transactions_and_Trades.php' => [
-        'label' => 'Transaction History', // Renamed for Investor
+        'label' => 'Transaction History', 
         'icon' => 'fas fa-exchange-alt', 
         'permissions' => ['Investor', 'Administrator', 'Management', 'Auditor']
     ],
@@ -33,7 +33,7 @@ $menu_items_config = [
     'Predictions.php' => [
         'label' => 'Stock Prediction', 
         'icon' => 'fas fa-crystal-ball', 
-        'permissions' => ['Administrator', 'Management', 'Company']
+        'permissions' => ['Administrator', 'Management']
     ],
     'Company_Database.php' => [
         'label' => 'Company Database', 
@@ -53,7 +53,7 @@ $menu_items_config = [
     'Institution_Database.php' => [
         'label' => 'Institutions', 
         'icon' => 'fas fa-landmark', 
-        'permissions' => ['Administrator', 'Database Manager', 'Management']
+        'permissions' => ['Administrator', 'Database Manager', 'Management', 'Institution']
     ],
     'Logs.php' => [
         'label' => 'System Logs', 

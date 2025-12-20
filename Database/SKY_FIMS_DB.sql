@@ -130,14 +130,6 @@ CREATE TABLE Audit_Report_T (
     FOREIGN KEY (Company_User_ID) REFERENCES Company_T(Company_User_ID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS Audit_Logs_T;
-CREATE TABLE Audit_Logs_T (
-  Report_ID INT(9) NOT NULL,
-  Log_ID INT(9) NOT NULL UNIQUE,
-  PRIMARY KEY (Report_ID, Log_ID),
-  FOREIGN KEY (Report_ID) REFERENCES Audit_Report_T(Report_ID),
-  FOREIGN KEY (Log_ID) REFERENCES Log_T(Log_ID)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 DROP TABLE IF EXISTS Fraud_Alert_T;
 CREATE TABLE Fraud_Alert_T (

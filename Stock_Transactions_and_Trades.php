@@ -12,7 +12,8 @@ $sql = "
         t.Share_Amount,
         s.Stock_ID,
         comp_user.Name as Company_Name,
-        inv_user.Name as Investor_Name
+        inv_user.Name as Investor_Name,
+        l.Timestamp
     FROM Stock_Transactions_T t
     JOIN Stock_T s ON t.Stock_ID = s.Stock_ID
     JOIN Company_T c ON s.Company_User_ID = c.Company_User_ID

@@ -3,7 +3,21 @@ session_start();
 
 // If the user is logged in, redirect to the main dashboard (Audits.php)
 if (isset($_SESSION['User_ID'])) {
-    header("Location: Audits.php");
+    $role = $_SESSION['Permission'];
+    
+    if ($role == 'Investor') {
+        header("Location: My_Stocks.php");
+    } elseif ($role == 'Company') {
+        header("Location: My_Company.php");
+    } elseif ($role == 'Institution') {
+        header("Location: My_Institution.php");
+    } elseif ($role == 'Fraud Detector') {
+        header("Location: Frauds.php");
+    } elseif ($role == 'Auditor') {
+        header("Location: Audits.php");
+    } else {
+        header("Location: Audits.php"); // Default for admins/managers
+    }
     exit();
 }
 

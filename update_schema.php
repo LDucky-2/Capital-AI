@@ -1,6 +1,9 @@
 <?php
 include 'Database.php';
 
+// Drop Audit_Logs_T request
+$conn->query("DROP TABLE IF EXISTS Audit_Logs_T");
+
 // Add Status column to Stock_T if it doesn't exist
 $sql = "SHOW COLUMNS FROM Stock_T LIKE 'Status'";
 $result = $conn->query($sql);
