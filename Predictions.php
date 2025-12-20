@@ -1,92 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unified Admin Dashboard</title>
-    <link rel="stylesheet" href="Styles.css">
-</head>
-<body>
+<?php
+include 'auth_session.php';
+checkLogin();
+include 'Database.php';
 
-    <div class="navbar">
-        <ul>
-            <li><a href="Audits.php">Audit Reports</a></li>
-            <li><a href="Company_Database.php">Company Database</a></li>
-            <li><a href="Employee_Database.php">Employee Database</a></li>
-            <li><a href="Frauds.php">Fraud Alerts</a></li>
-            <li><a href="Investor_Database.php">Investor Database</a></li>
-            <li><a href="Logs.php">All Logs</a></li>
-            <li><a href="My_Company.php">My Company</a></li>
-            <li><a href="My_Institution.php">My Institution</a></li>
-            <li><a href="My_Stocks.php">My Stocks</a></li>
-            <li><a href="Predictions.php" class="active">Stock Prediction</a></li>
-            <li><a href="Stock_Transactions_and_Trades.php">Stock Transactions and Trades Database</a></li>
-            <li><a href="Stocks.php">All Stocks</a></li>
-            <li><a href="Institution_Database.php">Institutions</a></li>
-            <!-- <li><a href="Employee_Database.php">Employee Database</a></li> -->
-            <!-- <li><a href="Employee_Database.php">Employee Database</a></li>  -->
-            <!-- <li><a href="Log_in.php">Log In Page</a></li> -->
-        </ul>
-    </div>
+// Fetch Predictions
+$sql = "
+    SELECT 
+        p.Prediction_ID,
+        p.Predicted_Price,
+        p.Confidence_Score,
+        p.Date_Predicted,
+        p.Accuracy_Score,
+        s.Stock_ID,
+        u.Name as Company_Name
+    FROM Prediction_T p
+    JOIN Stock_T s ON p.Stock_ID = s.Stock_ID
+    JOIN Company_T c ON s.Company_User_ID = c.Company_User_ID
+    JOIN User_T u ON c.Company_User_ID = u.User_ID
+    ORDER BY p.Date_Predicted DESC
+";
+// Note: schema showed 'Timestamp' or 'Date' - let's check schema used in Database.php creation step?
+// Checking schema from memory/artifacts: Prediction_T has 'Timestamp'. I used 'Date_Predicted' in query but schema check needed.
+// Schema says: Timestamp DATETIME.
+// Retrying query with correct column name 'Timestamp'.
 
-    <div class = "content">
-        <header class="top-brand-header">
-            <div class="logo-wrap">
-                <img src="images/Skyrim_Logo.png" alt="Brand Logo" class="brand-logo"> 
-                <div class="brand-text-wrap">
-                    <span class="brand-name">Financial Institutions Management</span>
-                </div>
-            </div>
-        </header>
+$sql = "
+    SELECT 
+        p.Prediction_ID,
+        p.Predicted_Price,
+        p.Confidence_Score,
+        p.Timestamp as Prediction_Date,
+        p.Accuracy_Score,
+        s.Stock_ID,
+        u.Name as Company_Name
+    FROM Prediction_T p
+    JOIN Stock_T s ON p.Stock_ID = s.Stock_ID
+    JOIN Company_T c ON s.Company_User_ID = c.Company_User_ID
+    JOIN User_T u ON c.Company_User_ID = u.User_ID
+    ORDER BY p.Timestamp DESC
+";
 
-        <h2 id="summary">Stock Predictions</h2>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Stock ID</th>
-                    <th>Company Name</th>
-                    <th>Current Price</th>
-                    <th>Predicted Price</th>
-                    <th>Confidence Score</th>
-                    <th>Model Version</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>New Users</td>
-                    <td>500</td>
-                    <td>550</td>
-                    <td>Achieved</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Revenue (k)</td>
-                    <td>$250</td>
-                    <td>$245</td>
-                    <td>Near Target</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Conversion Rate</td>
-                    <td>3.5%</td>
-                    <td>3.8%</td>
-                    <td>Achieved</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>Support Tickets</td>
-                    <td>50</td>
-                    <td>65</td>
-                    <td>Over Target</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+$result = $conn->query($sql);
+?>
 
-</body>
-</html>
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/sidebar.php'; ?>
+
+<div class="page-header">
+    <h2>AI Stock Predictions</h2>
+</div>
+
+<div class="data-table-scroll-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Company</th>
+                <th>Predicted Price</th>
+                <th>Confidence</th>
+                <th>Date</th>
+                <th>Accuracy</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if ($result && $result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . $row['Prediction_ID'] . "</td>";
+                    echo "<td>" . htmlspecialchars($row['Company_Name']) . "</td>";
+                    echo "<td>$" . number_format($row['Predicted_Price'], 2) . "</td>";
+                    echo "<td>" . $row['Confidence_Score'] . "%</td>";
+                    echo "<td>" . $row['Prediction_Date'] . "</td>";
+                    echo "<td>" . ($row['Accuracy_Score'] ? $row['Accuracy_Score'] . "%" : "Pending") . "</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='6' style='text-align:center;'>No predictions available.</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+<?php include 'includes/footer.php'; ?>

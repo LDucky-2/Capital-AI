@@ -1,368 +1,413 @@
-/* ========================================================= */
-/* 1. GLOBAL & RESET STYLES */
-/* ========================================================= */
-body {
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap');
+
+:root {
+    /* Luxury Light Palette */
+    --bg-body: #f4f6f5;
+    /* Very light gray/green tint */
+    --bg-card: #ffffff;
+    --bg-header: #000000;
+
+    --primary-dark: #064E3B;
+    /* Deep Emerald for text/headers */
+    --primary-main: #10B981;
+    /* Brighter green for active states/buttons */
+    --primary-accent: #047857;
+    /* Medium green */
+
+    --accent-gold: #b38b2d;
+    /* Darker gold for visibility on white */
+
+    --text-main: #1f2937;
+    /* Dark gray for body text */
+    --text-muted: #6b7280;
+    --text-header: #064E3B;
+
+    --border-color: #e5e7eb;
+
+    --sidebar-width: 250px;
+    --header-height: 60px;
+}
+
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-    background-color: #f8f9fa;
-}
-
-/* ========================================================= */
-/* 2. VERTICAL NAVBAR STYLING (UPDATED) */
-/* ========================================================= */
-.navbar {
-    position: fixed;
-    top: 70px; /* Starts 70px from the top */
-    left: 0;
-    width: 220px; 
-    height: calc(100% - 70px); /* Fill the rest of the height */
-    background-color: #212529; 
-    color: white; 
-    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.15); 
-    /* padding-top: 40px;  */
-
-    overflow-y: auto; 
-    /* =================================== */
-}
-
-.navbar ul {
-    list-style-type: none;
     padding: 0;
-    margin: 0;
 }
 
-.navbar a {
-    display: block;
-    color: #ced4da;
-    padding: 18px 25px; 
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    border-left: 5px solid transparent; 
-    transition: all 0.3s ease;
-}
-
-.navbar a:hover:not(.active) {
-    background-color: #343a40; 
-    color: white; 
-    border-left: 5px solid #495057; 
-}
-
-.navbar a.active {
-    background-color: #007bff; 
-    color: white;
-    font-weight: 700;
-    border-left: 5px solid #0056b3; 
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    line-height: 1.6;
 }
 
 
-/* ========================================================= */
-/* 3. MAIN CONTENT AREA STYLING (UPDATED) */
-/* ========================================================= */
-.content {
-    /* Offset from navbar (240px) PLUS header (70px) */
-    margin-left: 240px; 
-    margin-top: 20px; /* Shift content down below the fixed top header */
-    padding: 30px;
-    /* ... rest of the content styles ... */
-}
-/* Ensure the H1 doesn't have excess top margin */
-.content h1 {
-    margin-top: 0; 
-    color: #343a40;
-    margin-bottom: 25px;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 10px;
-}
-
-.content h2 {
-    color: #495057;
-    padding-top: 15px; 
-    margin-bottom: 15px;
-}
-
-
-/* ========================================================= */
-/* 4. LOGIN FORM STYLING (Applies to login.php) */
-/* ========================================================= */
-
-/* Centering Styles for the standalone Login Page */
-.login-page {
-    /* Overrides the default body style for centering */
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #e9ecef; /* Slightly darker background for focus */
-}
-
-.login-container {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
-    width: 100%;
-    max-width: 400px; 
-    text-align: center;
-}
-
-.login-container h2 {
-    margin-bottom: 30px;
-    color: #343a40;
-    font-size: 28px;
-    font-weight: 600;
-}
-
-.input-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #495057;
-    font-weight: 500;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    box-sizing: border-box; 
-    font-size: 16px;
-    transition: border-color 0.3s;
-}
-
-.input-group input:focus {
-    border-color: #007bff; 
-    outline: none; 
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-.login-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #007bff; 
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-.signup-button {
-    width: 100%;
-    padding: 12px;
-    background-color: #007bff; 
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-
-.login-button:hover {
-    background-color: #0056b3; 
-}
-.signup-button:hover {
-    background-color: #0056b3; 
-}
-
-.options {
-    margin-top: 25px;
-    font-size: 14px;
-}
-
-.options a {
-    color: #007bff;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-.options a:hover {
-    color: #0056b3;
-    text-decoration: underline;
-}
-
-.options span {
-    color: #6c757d;
-    margin: 0 10px;
-}
-
-.back-link {
-    margin-top: 25px;
-}
-.back-link a {
-    color: #6c757d;
-    text-decoration: none;
-    font-size: 14px;
-}
-.back-link a:hover {
-    color: #343a40;
-    text-decoration: underline;
-}
-/* ========================================================= */
-/* 5. TABLE STYLING */
-/* ========================================================= */
-.data-table {
-    width: 100%;
-    border-collapse: collapse; 
-    margin: 25px 0;
-    font-size: 1em;
-    min-width: 400px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); 
-    border-radius: 8px; 
-    overflow: hidden; 
-}
-
-/* --- Fixed Header and Scrollable Body --- */
-
-/* Wrapper to define the total height of the scrollable section */
-.data-table-scroll-wrapper {
-    max-height: 400px; 
-    overflow-y: auto;
-    width: 100%;
-    margin-bottom: 25px; 
-    
-    /* === ADD THESE LINES FOR THE BORDER === */
-    border: 1px solid #ced4da; /* Light gray border around the whole table/wrapper */
-    border-radius: 8px; /* Apply the border radius to the wrapper */
-    /* ======================================= */
-    
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05); 
-}
-
-/* Ensure the table itself stretches inside the wrapper */
-.data-table {
-    width: 100%;
-    margin: 0; 
-    box-shadow: none; 
-    border-radius: 0;
-    
-    /* Set borders to be inside the collapsed table */
-    /* This ensures that the outer border defined on the wrapper is the only full border visible */
-    border: none; 
-}
-
-
-/* Table Header Styles - Must be defined separately if using complex scrollable techniques */
-.data-table thead tr {
-    background-color: #007bff; 
-    color: #ffffff;
-    text-align: left;
-    font-weight: 600;
-}
-
-/* Header and Data Cell Padding (Keep these) */
-.data-table th, 
-.data-table td {
-    padding: 12px 15px;
-    /* Ensure all cells have the same box-sizing */
-    box-sizing: border-box; 
-}
-/* Table Body Row Styling */
-.data-table tbody tr {
-    border-bottom: 1px solid #dddddd; /* Keep the row separator line */
-    background-color: #ffffff;
-}
-
-/* Alternating Row Color (Stripe Effect) */
-.data-table tbody tr:nth-of-type(even) {
-    background-color: #f3f3f3; /* Very light gray for even rows */
-}
-
-/* Highlight Row on Hover */
-.data-table tbody tr:hover {
-    background-color: #e0e0e0; /* Slightly darker on hover */
-    cursor: default;
-    transition: background-color 0.3s ease;
-}
-
-/* Style for the last row */
-.data-table tbody tr:last-of-type {
-    border-bottom: 2px solid #007bff; /* Thicker line at the bottom */
-}
-
-/* ========================================================= */
-/* 6. TOP TITLE (HERO) AREA STYLING */
-/* ========================================================= */
-.hero-header {
-    background-color: #ffffff; /* White background */
-    border: 1px solid #dee2e6; /* Light gray border */
-    padding: 40px;
-    margin-bottom: 30px; /* Space before the rest of the content */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle lift */
-}
-
-.hero-header h1 {
-    color: #007bff; /* Primary blue color */
-    font-size: 36px;
-    margin-top: 0;
-    margin-bottom: 10px;
-    /* Remove the border bottom style inherited from .content h1 */
-    border-bottom: none; 
-    padding-bottom: 0;
-}
-
-.hero-header p {
-    color: #6c757d;
-    font-size: 18px;
-    margin-bottom: 0;
-}
-/* ========================================================= */
-/* 7. TOP BRANDING HEADER STYLING (Generic) */
-/* ========================================================= */
-.top-brand-header {
-    /* Fixed position, spans full width, high Z-index */
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 100%; 
-    height: 70px; 
-    z-index: 1000; 
-
-    /* Styling */
-    background-color: #000000; /* Blue color */
-    color: #ffffff;
-    padding: 0 30px; 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    
+/* App Structure */
+.app-container {
     display: flex;
-    align-items: center; 
-    justify-content: flex-start;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+.top-brand-header {
+    height: var(--header-height);
+    background-color: var(--bg-header);
+    border-bottom: 2px solid var(--accent-gold);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .logo-wrap {
     display: flex;
     align-items: center;
-}
-
-.brand-logo {
-    height: 40px; 
-    width: auto;
-    margin-right: 15px;
-}
-
-.brand-text-wrap {
-    display: flex;
-    flex-direction: column;
+    gap: 15px;
 }
 
 .brand-name {
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 1.2;
+    font-family: 'Playfair Display', serif;
+    color: var(--accent-gold);
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-left: 0;
+    /* Handled by gap in .logo-wrap */
 }
 
-/* * The positioning adjustments for .navbar, .content, and .login-container 
-* remain unchanged as they only rely on the fixed height (70px).
-*/
+.brand-logo {
+    height: 50px;
+    width: 50px;
+    /* Fixed square for circle */
+    border-radius: 50%;
+    /* Circular */
+    object-fit: cover;
+    display: block;
+}
+
+.brand-subtitle {
+    display: none;
+}
+
+.user-profile {
+    color: var(--accent-gold);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.logout-btn {
+    color: var(--accent-gold);
+    margin-left: 15px;
+    text-decoration: none;
+    border: 1px solid var(--accent-gold);
+    padding: 5px 10px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: var(--accent-gold);
+    color: #000;
+}
+
+/* Layout */
+.main-layout {
+    display: flex;
+    margin-top: var(--header-height);
+    height: calc(100vh - var(--header-height));
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: #ffffff;
+    border-right: 1px solid var(--border-color);
+    height: 100%;
+    overflow-y: auto;
+}
+
+.nav-menu ul {
+    list-style: none;
+}
+
+.nav-menu li a {
+    display: block;
+    padding: 15px 20px;
+    color: var(--text-main);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.nav-menu li a:hover,
+.nav-menu li a.active {
+    background-color: #ecfdf5;
+    /* Very light green bg */
+    color: var(--primary-dark);
+    border-left: 4px solid var(--accent-gold);
+    padding-left: 16px;
+}
+
+.nav-icon {
+    margin-right: 10px;
+    color: var(--accent-gold);
+    width: 20px;
+    text-align: center;
+}
+
+/* Content */
+.content-area {
+    flex: 1;
+    background-color: var(--bg-body);
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* Typography & Headings */
+h2,
+.page-header h2 {
+    font-family: 'Playfair Display', serif;
+    color: var(--primary-dark);
+    border-bottom: 2px solid var(--accent-gold);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+/* Tables */
+.data-table-scroll-wrapper {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    overflow-y: auto;
+    position: relative;
+    transition: max-height 0.3s ease;
+}
+
+/* Dynamic sizing classes */
+.data-table-scroll-wrapper.single-table-view {
+    max-height: 550px;
+    /* ~10-12 entries */
+}
+
+.data-table-scroll-wrapper.multi-table-view {
+    max-height: 300px;
+    /* ~5-6 entries */
+}
+
+/* Custom scrollbar for premium feel */
+.data-table-scroll-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.data-table-scroll-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.data-table-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: var(--accent-gold);
+    border-radius: 10px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background-color: var(--primary-dark);
+    color: #fff;
+    text-align: left;
+    padding: 12px 15px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    user-select: none;
+}
+
+.data-table th:hover {
+    background-color: var(--primary-accent);
+}
+
+.data-table th::after {
+    content: '\f0dc';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 8px;
+    opacity: 0.3;
+    font-size: 0.7rem;
+}
+
+.data-table th.sort-asc::after {
+    content: '\f0de';
+    opacity: 1;
+    color: var(--accent-gold);
+}
+
+.data-table th.sort-desc::after {
+    content: '\f0dd';
+    opacity: 1;
+    color: var(--accent-gold);
+}
+
+.data-table td {
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 15px;
+    color: var(--text-main);
+    font-size: 0.9rem;
+}
+
+.data-table tr:hover {
+    background-color: #f9fafb;
+}
+
+/* Cards & Sections */
+.content-section,
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    /* No border radius */
+}
+
+.section-title,
+h3 {
+    color: var(--primary-dark);
+    margin-bottom: 15px;
+    font-weight: 600;
+    border-left: 4px solid var(--accent-gold);
+    padding-left: 10px;
+}
+
+/* Auth Pages */
+.auth-wrapper {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-card {
+    background-color: var(--bg-card);
+    border: 2px solid var(--accent-gold);
+    padding: 40px;
+    width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-title {
+    color: var(--primary-dark);
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+}
+
+.input-group label {
+    display: block;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 12px;
+    background-color: #fff;
+    border: 1px solid #d1d5db;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 2px rgba(6, 78, 59, 0.1);
+}
+
+.btn-primary,
+.login-button {
+    width: 100%;
+    background-color: var(--primary-dark);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-primary:hover,
+.login-button:hover {
+    background-color: var(--primary-accent);
+    color: #fff;
+}
+
+.btn-action {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: var(--primary-dark);
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0;
+    border: none;
+    min-width: 100px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-action:hover {
+    background-color: var(--primary-accent);
+}
+
+.alert {
+    padding: 10px;
+    background-color: #ecfdf5;
+    border: 1px solid var(--primary-main);
+    margin-bottom: 20px;
+    color: var(--primary-dark);
+    font-size: 0.9rem;
+}
+
+.auth-header .brand-logo {
+    display: block;
+    height: 70px;
+    width: 70px;
+    object-fit: cover;
+    margin: 0 auto 10px auto;
+    border-radius: 50%;
+}

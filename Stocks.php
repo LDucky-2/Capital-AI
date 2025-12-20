@@ -1,81 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unified Admin Dashboard</title>
-    <link rel="stylesheet" href="Styles.css">
-</head>
-<body>
+<?php
+include 'auth_session.php';
+checkLogin();
+include 'Database.php';
+$user_role = $_SESSION['Permission'];
+if ($user_role === 'Fraud Detector') {
+    echo "<div class='content'><div class='alert'>Access Denied. Fraud Detectors do not have access to the Market page.</div></div>";
+    include 'includes/footer.php';
+    exit();
+}
 
-    <div class="navbar">
-        <ul>
-            <li><a href="Audits.php">Audit Reports</a></li>
-            <li><a href="Company_Database.php">Company Database</a></li>
-            <li><a href="Employee_Database.php">Employee Database</a></li>
-            <li><a href="Frauds.php">Fraud Alerts</a></li>
-            <li><a href="Investor_Database.php">Investor Database</a></li>
-            <li><a href="Logs.php">All Logs</a></li>
-            <li><a href="My_Company.php">My Company</a></li>
-            <li><a href="My_Institution.php">My Institution</a></li>
-            <li><a href="My_Stocks.php">My Stocks</a></li>
-            <li><a href="Predictions.php">Stock Prediction</a></li>
-            <li><a href="Stock_Transactions_and_Trades.php">Stock Transactions and Trades Database</a></li>
-            <li><a href="Stocks.php" class="active">All Stocks</a></li>
-            <li><a href="Institution_Database.php">Institutions</a></li>
-            <!-- <li><a href="Employee_Database.php">Employee Database</a></li> -->
-            <!-- <li><a href="Employee_Database.php">Employee Database</a></li>  -->
-            <!-- <li><a href="Log_in.php">Log In Page</a></li> -->
-        </ul>
-    </div>
+// Block Company Access
+if (hasRole('Company')) {
+    echo "<div class='content'><div class='alert'>Access Denied. Companies are not permitted to view the market list.</div></div>";
+    include 'includes/footer.php';
+    exit();
+}
 
-    <div class = "content">
-        <header class="top-brand-header">
-            <div class="logo-wrap">
-                <img src="images/Skyrim_Logo.png" alt="Brand Logo" class="brand-logo"> 
-                <div class="brand-text-wrap">
-                    <span class="brand-name">Financial Institutions Management</span>
-                </div>
-            </div>
-        </header>
-        <h2 id="summary">📊 Data Summary</h2>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Stock ID</th>
-                    <th>Company Name</th>
-                    <th>Total Shares</th>
-                    <th>Current Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>New Users</td>
-                    <td>500</td>
-                    <td>550</td>
-                    <td>Achieved</td>
-                </tr>
-                <tr>
-                    <td>Revenue (k)</td>
-                    <td>$250</td>
-                    <td>$245</td>
-                    <td>Near Target</td>
-                </tr>
-                <tr>
-                    <td>Conversion Rate</td>
-                    <td>3.5%</td>
-                    <td>3.8%</td>
-                    <td>Achieved</td>
-                </tr>
-                <tr>
-                    <td>Support Tickets</td>
-                    <td>50</td>
-                    <td>65</td>
-                    <td>Over Target</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+// Optimized Query
+$sql = "
+    SELECT 
+        s.Stock_ID, 
+        u.Name as Company_Name, 
+        s.Total_Shares, 
+        s.Current_Price,
+        (s.Total_Shares - COALESCE(SUM(CASE WHEN t.Transaction_Type = 'buy' THEN t.Share_Amount ELSE -t.Share_Amount END), 0)) as Available_Shares
+    FROM Stock_T s 
+    JOIN Company_T c ON s.Company_User_ID = c.Company_User_ID 
+    JOIN User_T u ON c.Company_User_ID = u.User_ID
+    LEFT JOIN Stock_Transactions_T t ON s.Stock_ID = t.Stock_ID
+    WHERE s.Status = 'Open' AND u.Status = 'Active'
+    GROUP BY s.Stock_ID
+    ORDER BY u.Name ASC
+";
+$Stocks = $conn->query($sql);
 
-</body>
-</html>
+$is_trader = hasRole(['Investor', 'Management']);
+?>
+
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/sidebar.php'; ?>
+
+<div class="page-header">
+    <h2>Market - All Stocks</h2>
+</div>
+
+<?php
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] == 'bought') echo "<div class='alert'>Stock purchase successful!</div>";
+    if ($_GET['msg'] == 'error') echo "<div class='alert' style='border-color:red; color:red;'>Transaction failed.</div>";
+}
+?>
+
+<div class="data-table-scroll-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Stock ID</th>
+                <th>Company Name</th>
+                <th>Available Shares</th>
+                <th>Current Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if ($Stocks && $Stocks->num_rows > 0) {
+                while($row = $Stocks->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($row['Stock_ID']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['Company_Name']) . "</td>";
+                    echo "<td>" . number_format($row['Available_Shares']) . "</td>";
+                    echo "<td>$" . htmlspecialchars($row['Current_Price']) . "</td>";
+                    echo "<td style='display: flex; gap: 8px; align-items: center;'>";
+                    echo "<a href='Stock_Details.php?id=" . $row['Stock_ID'] . "' class='btn-action' style='background:#28a745; color:white;'>View Info</a> ";
+                    echo "<a href='Price_History.php?id=" . $row['Stock_ID'] . "' class='btn-action' style='background:#28a745; color:white;'>History</a> ";
+                    if ($is_trader) {
+                        // Simple form for buying
+                        echo "<form action='stock_action.php' method='POST' style='display:contents;'>";
+                        echo "<input type='hidden' name='stock_id' value='" . $row['Stock_ID'] . "'>";
+                        echo "<input type='hidden' name='action' value='buy'>";
+                        echo "<input type='number' name='amount' placeholder='Qty' min='1' max='" . $row['Available_Shares'] . "' style='width:60px; padding:5px; margin:0; background:#111; border:1px solid #333; color:#fff;' required>";
+                        echo "<button type='submit' class='btn-action' style='background:#28a745; color:white; border:none;'>BUY</button>";
+                        echo "</form>";
+                    }
+                    echo "</td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='5' style='text-align:center;'>No stocks found.</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+<?php include 'includes/footer.php'; ?>

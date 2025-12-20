@@ -1,250 +1,232 @@
-<?php include 'Database.php';
+<?php
+include 'auth_session.php';
+checkLogin();
+include 'Database.php';
 
-$sql = "
-SELECT user_t.User_ID,user_t.Name,user_t.Password,user_t.Email_Address,user_t.Status
-FROM user_t
-WHERE Permission = 'Database Manager'
-ORDER BY user_t.User_ID
-";
-$Database_Managers = $conn->query($sql);
-$sql = "
-SELECT user_t.User_ID,user_t.Name,user_t.Password,user_t.Email_Address,user_t.Status,auditor_t.Auditing_Firm
-FROM user_t,auditor_t
-WHERE Permission = 'Auditors' AND auditor_t.Auditor_User_ID = user_t.User_ID
-ORDER BY user_t.User_ID
-";
-$Auditors = $conn->query($sql);
-$sql = "
-SELECT user_t.User_ID,user_t.Name,user_t.Password,user_t.Email_Address,user_t.Status
-FROM user_t
-WHERE Permission = 'Fraud Detector'
-ORDER BY user_t.User_ID
-";
-$Fraud_Detectors = $conn->query($sql);
-$sql = "
-SELECT user_t.User_ID,user_t.Name,user_t.Password,user_t.Email_Address,user_t.Status
-FROM user_t
-WHERE Permission = 'Administrator'
-ORDER BY user_t.User_ID
-";
-$System_Administrators = $conn->query($sql);
-$sql = "
-SELECT user_t.User_ID,user_t.Name,user_t.Password,user_t.Email_Address,user_t.Status
-FROM user_t
-WHERE Permission = 'Management'
-ORDER BY user_t.User_ID
-";
-$Management = $conn->query($sql);
+// Access Control
+if (!hasRole(['Administrator'])) {
+    echo "<div class='content'><div class='alert'>Access Denied. You do not have permission to view the Employee Database.</div></div>";
+    include 'includes/footer.php';
+    exit();
+}
+
+$message = "";
+// Handle Pre-registration
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'preregister' && hasRole('Administrator')) {
+    $name = $conn->real_escape_string($_POST['name']);
+    $password = $_POST['password'];
+    $role = $conn->real_escape_string($_POST['permission']);
+    $status = "Inactive";
+
+    $sql = "INSERT INTO User_T (Name, Password, Status, Permission) VALUES ('$name', '$password', '$status', '$role')";
+    if ($conn->query($sql)) {
+        $new_id = $conn->insert_id;
+        $message = "<div class='alert alert-success'>Staff member '$name' pre-registered successfully! <strong>Assigned ID: $new_id</strong> (Provide this ID to the staff member for activation).</div>";
+    } else {
+        $message = "<div class='alert alert-danger'>Error: " . $conn->error . "</div>";
+    }
+}
+
+// Fetch various employee types
+$sql_fraud = "SELECT User_ID, Name, Email_Address, Status, Permission FROM User_T WHERE Permission = 'Fraud Detector' ORDER BY User_ID";
+$Fraud_Detectors = $conn->query($sql_fraud);
+
+$sql_admin = "SELECT User_ID, Name, Email_Address, Status, Permission FROM User_T WHERE Permission = 'Administrator' ORDER BY User_ID";
+$System_Administrators = $conn->query($sql_admin);
+
+$sql_mgmt = "SELECT User_ID, Name, Email_Address, Status, Permission FROM User_T WHERE Permission = 'Management' ORDER BY User_ID";
+$Management = $conn->query($sql_mgmt);
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unified Admin Dashboard</title>
-    <link rel="stylesheet" href="Styles.css">
-</head>
-<body>
+<?php include 'includes/header.php'; ?>
+<?php include 'includes/sidebar.php'; ?>
 
-    <div class="navbar">
-        <ul>
-            <li><a href="Audits.php">Audit Reports</a></li>
-            <li><a href="Company_Database.php">Company Database</a></li>
-            <li><a href="Employee_Database.php" class="active">Employee Database</a></li>
-            <li><a href="Frauds.php">Fraud Alerts</a></li>
-            <li><a href="Investor_Database.php">Investor Database</a></li>
-            <li><a href="Logs.php">All Logs</a></li>
-            <li><a href="My_Company.php">My Company</a></li>
-            <li><a href="My_Institution.php">My Institution</a></li>
-            <li><a href="My_Stocks.php">My Stocks</a></li>
-            <li><a href="Predictions.php">Stock Prediction</a></li>
-            <li><a href="Stock_Transactions_and_Trades.php">Stock Transactions and Trades Database</a></li>
-            <li><a href="Stocks.php">All Stocks</a></li>
-            <li><a href="Institution_Database.php">Institutions</a></li>
-            <!-- <li><a href="Employee_Database.php">Employee Database</a></li> -->
-            <!-- <li><a href="Employee_Database.php">Employee Database</a></li>  -->
-            <!-- <li><a href="Log_in.php">Log In Page</a></li> -->
-        </ul>
+<div class="page-header">
+    <h2>Employee Database</h2>
+    <p style="color:var(--text-muted);">Internal staff and department management</p>
+</div>
+
+<?php echo $message; ?>
+
+<?php if (hasRole('Administrator')): ?>
+<div class="content-section" style="margin-bottom: 2rem; border: 1px dashed var(--primary-color);">
+    <h3 class="section-title"><i class="fas fa-user-plus"></i> Pre-register Internal Staff</h3>
+    <form action="" method="POST" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <input type="hidden" name="action" value="preregister">
+        <div class="input-group" style="margin-bottom:0;">
+            <label>Full Name</label>
+            <input type="text" name="name" required placeholder="Staff Name">
+        </div>
+        <div class="input-group" style="margin-bottom:0;">
+            <label>Temp Password</label>
+            <input type="text" name="password" required placeholder="Password">
+        </div>
+        <div class="input-group" style="margin-bottom:0;">
+            <label>Permission</label>
+            <select name="permission" required>
+                <option value="Management">Management</option>
+                <option value="Administrator">Administrator</option>
+                <option value="Fraud Detector">Fraud Detector</option>
+            </select>
+        </div>
+        <div class="input-group" style="margin-bottom:0;">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn-primary" style="height: 42px; width: 100%;">Pre-register</button>
+        </div>
+    </form>
+</div>
+<?php endif; ?>
+
+
+
+<div class="content-section" style="margin-bottom: 2rem;">
+    <h3 class="section-title"><i class="fas fa-shield-alt"></i> Fraud Detectors</h3>
+    <div class="data-table-scroll-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <?php if (hasRole('Administrator')) echo "<th>Action</th>"; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($Fraud_Detectors && $Fraud_Detectors->num_rows > 0) {
+                    while($row = $Fraud_Detectors->fetch_assoc()) {
+                        $isFrozen = ($row['Status'] == 'Frozen');
+                        $rowStyle = $isFrozen ? "style='opacity: 0.6; background: #f8f9fa;'" : "";
+                        echo "<tr $rowStyle>";
+                        echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
+                        echo "<td>";
+                        $statusBadge = $isFrozen ? "color: #dc3545; border-color: #dc3545;" : "color: #28a745; border-color: #28a745;";
+                        echo "<span class='btn-action' style='background:transparent; padding: 2px 8px; font-size: 0.8rem; cursor: default; $statusBadge'>" . htmlspecialchars($row['Status']) . "</span>";
+                        echo "</td>";
+                        if (hasRole('Administrator') && $row['Permission'] !== 'Administrator') {
+                            $newStatus = $isFrozen ? 'Active' : 'Frozen';
+                            $btnLabel = $isFrozen ? 'Unfreeze' : 'Freeze';
+                            $btnIcon = $isFrozen ? 'fa-unlock' : 'fa-snowflake';
+                            $btnColor = $isFrozen ? '#28a745' : '#dc3545';
+                            echo "<td style='display: flex; gap: 8px; align-items: center;'>";
+                            echo "<form action='user_action.php' method='POST' style='margin:0;'>";
+                            echo "<input type='hidden' name='user_id' value='{$row['User_ID']}'>";
+                            echo "<input type='hidden' name='status' value='$newStatus'>";
+                            echo "<input type='hidden' name='redirect' value='Employee_Database.php'>";
+                            echo "<button type='submit' class='btn-action' style='background:$btnColor; color:white;'>$btnLabel</button>";
+                            echo "</form>";
+                            echo "</td>";
+                        }
+                        echo "</tr>";
+                    }
+                } else { echo "<tr><td colspan='5'>No records found.</td></tr>"; }
+                ?>
+            </tbody>
+        </table>
     </div>
+</div>
 
-    <div class = "content">
-        <header class="top-brand-header">
-            <div class="logo-wrap">
-                <img src="images/Skyrim_Logo.png" alt="Brand Logo" class="brand-logo"> 
-                <div class="brand-text-wrap">
-                    <span class="brand-name">Financial Institutions Management</span>
-                </div>
-            </div>
-        </header>
-
-        <h2 id="summary">Database Managers</h2>
-        <div class="data-table-scroll-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Database Manager ID</th>
-                        <th>Name</th>
-                        <th>Password</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
+<div class="content-section" style="margin-bottom: 2rem;">
+    <h3 class="section-title"><i class="fas fa-user-shield"></i> System Administrators</h3>
+    <div class="data-table-scroll-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <?php if (hasRole('Administrator')) echo "<th>Action</th>"; ?>
+                </tr>
+            </thead>
+            <tbody>
                 <?php
-                    if ($Database_Managers && $Database_Managers->num_rows > 0) {
-                        while($row = $Database_Managers->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Password']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Status']) . "</td>";
-                            echo "</tr>";
+                if ($System_Administrators && $System_Administrators->num_rows > 0) {
+                    while($row = $System_Administrators->fetch_assoc()) {
+                        $isFrozen = ($row['Status'] == 'Frozen');
+                        $rowStyle = $isFrozen ? "style='opacity: 0.6; background: #f8f9fa;'" : "";
+                        echo "<tr $rowStyle>";
+                        echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
+                        echo "<td>";
+                        $statusBadge = $isFrozen ? "color: #dc3545; border-color: #dc3545;" : "color: #28a745; border-color: #28a745;";
+                        echo "<span class='btn-action' style='background:transparent; padding: 2px 8px; font-size: 0.8rem; cursor: default; $statusBadge'>" . htmlspecialchars($row['Status']) . "</span>";
+                        echo "</td>";
+                        if (hasRole('Administrator') && $row['Permission'] !== 'Administrator') {
+                            $newStatus = $isFrozen ? 'Active' : 'Frozen';
+                            $btnLabel = $isFrozen ? 'Unfreeze' : 'Freeze';
+                            $btnIcon = $isFrozen ? 'fa-unlock' : 'fa-snowflake';
+                            $btnColor = $isFrozen ? '#28a745' : '#dc3545';
+                            echo "<td style='display: flex; gap: 8px; align-items: center;'>";
+                            echo "<form action='user_action.php' method='POST' style='margin:0;'>";
+                            echo "<input type='hidden' name='user_id' value='{$row['User_ID']}'>";
+                            echo "<input type='hidden' name='status' value='$newStatus'>";
+                            echo "<input type='hidden' name='redirect' value='Employee_Database.php'>";
+                            echo "<button type='submit' class='btn-action' style='background:$btnColor; color:white;'>$btnLabel</button>";
+                            echo "</form>";
+                            echo "</td>";
                         }
-                    } else {
-                        echo "<tr><td colspan='5'>No Database manager found.</td></tr>";
+                        echo "</tr>";
                     }
+                } else { echo "<tr><td colspan='5'>No records found.</td></tr>"; }
                 ?>
-                </tbody>
-            </table>
-        </div>
-        
-
-        <h2 id="summary">Auditors</h2>
-        <div class="data-table-scroll-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Auditor ID</th>
-                        <th>Name</th>
-                        <th>Password</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Auditing Firm</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
-                    if ($Auditors && $Auditors->num_rows > 0) {
-                        while($row = $Auditors->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Password']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Status']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Auditing_Firm']) . "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='6'>No Auditors found.</td></tr>";
-                    }
-                ?>
-                </tbody>
-            </table>
-            
-        </div>
-
-        <h2 id="summary">Fraud Detectors</h2>
-        <div class="data-table-scroll-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Password</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
-                    if ($Fraud_Detectors && $Fraud_Detectors->num_rows > 0) {
-                        while($row = $Fraud_Detectors->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Password']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Status']) . "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='5'>No Fraud detectors found.</td></tr>";
-                    }
-                ?>
-                </tbody>
-            </table>
-            
-        </div>
-
-        <h2 id="summary">System Administrators</h2>
-        <div class="data-table-scroll-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Password</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
-                    if ($System_Administrators && $System_Administrators->num_rows > 0) {
-                        while($row = $System_Administrators->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Password']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Status']) . "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='5'>No System admin found.</td></tr>";
-                    }
-                ?>
-                </tbody>
-            </table>
-            
-        </div>
-
-        <h2 id="summary">Management</h2>
-        <div class="data-table-scroll-wrapper">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Password</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php
-                    if ($Management && $Management->num_rows > 0) {
-                        while($row = $Management->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Password']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['Status']) . "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='5'>No Management decision maker found.</td></tr>";
-                    }
-                ?>
-                </tbody>
-            </table>
-            <?php $conn->close(); ?>
-        </div>
+            </tbody>
+        </table>
     </div>
+</div>
 
-</body>
-</html>
+<div class="content-section">
+    <h3 class="section-title"><i class="fas fa-users-cog"></i> Management</h3>
+    <div class="data-table-scroll-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <?php if (hasRole('Administrator')) echo "<th>Action</th>"; ?>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($Management && $Management->num_rows > 0) {
+                    while($row = $Management->fetch_assoc()) {
+                        $isFrozen = ($row['Status'] == 'Frozen');
+                        $rowStyle = $isFrozen ? "style='opacity: 0.6; background: #f8f9fa;'" : "";
+                        echo "<tr $rowStyle>";
+                        echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
+                        echo "<td>";
+                        $statusBadge = $isFrozen ? "color: #dc3545; border-color: #dc3545;" : "color: #28a745; border-color: #28a745;";
+                        echo "<span class='btn-action' style='background:transparent; padding: 2px 8px; font-size: 0.8rem; cursor: default; $statusBadge'>" . htmlspecialchars($row['Status']) . "</span>";
+                        echo "</td>";
+                        if (hasRole('Administrator') && $row['Permission'] !== 'Administrator') {
+                            $newStatus = $isFrozen ? 'Active' : 'Frozen';
+                            $btnLabel = $isFrozen ? 'Unfreeze' : 'Freeze';
+                            $btnIcon = $isFrozen ? 'fa-unlock' : 'fa-snowflake';
+                            $btnColor = $isFrozen ? '#28a745' : '#dc3545';
+                            echo "<td style='display: flex; gap: 8px; align-items: center;'>";
+                            echo "<form action='user_action.php' method='POST' style='margin:0;'>";
+                            echo "<input type='hidden' name='user_id' value='{$row['User_ID']}'>";
+                            echo "<input type='hidden' name='status' value='$newStatus'>";
+                            echo "<input type='hidden' name='redirect' value='Employee_Database.php'>";
+                            echo "<button type='submit' class='btn-action' style='background:$btnColor; color:white;'>$btnLabel</button>";
+                            echo "</form>";
+                            echo "</td>";
+                        }
+                        echo "</tr>";
+                    }
+                } else { echo "<tr><td colspan='5'>No records found.</td></tr>"; }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<?php include 'includes/footer.php'; ?>
