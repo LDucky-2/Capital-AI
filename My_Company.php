@@ -107,7 +107,7 @@ $audits_result = $conn->query($sql_audits);
                 <p><strong>Current Price:</strong> $<?php echo number_format($stock['Current_Price'], 2); ?></p>
                 <p><strong>Total Shares:</strong> <?php echo number_format($stock['Total_Shares']); ?></p>
                 <p><strong>Available Shares:</strong> <?php echo number_format($shares_left); ?></p>
-                <a href="Price_History.php?id=<?php echo $stock['Stock_ID']; ?>" class="btn-action">View Price History</a>
+                <a href="Price_History.php?id=<?php echo $stock['Stock_ID']; ?>" class="btn-action" style="background:#28a745; color:white; border:none;">View Price History</a>
             </div>
             
             <!-- OPEN/CLOSE TOGGLE -->
@@ -116,10 +116,10 @@ $audits_result = $conn->query($sql_audits);
                 <input type="hidden" name="stock_id" value="<?php echo $stock['Stock_ID']; ?>">
                 <input type="hidden" name="current_status" value="<?php echo $stock['Status'] ?? 'Open'; ?>">
                 <?php if (($stock['Status'] ?? 'Open') == 'Open'): ?>
-                    <button type="submit" class="btn-action" style="background-color: #d9534f;">Limit Trading (Close)</button>
+                    <button type="submit" class="btn-action" style="background-color: #28a745; color:white; border:none;">Limit Trading (Close)</button>
                     <small style="display:block; margin-top:5px; color:gray;">Prevents new buys.</small>
                 <?php else: ?>
-                    <button type="submit" class="btn-action" style="background-color: var(--primary-main);">Open Trading</button>
+                    <button type="submit" class="btn-action" style="background-color: #28a745; color:white; border:none;">Open Trading</button>
                 <?php endif; ?>
             </form>
         </div>

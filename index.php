@@ -15,8 +15,10 @@ if (isset($_SESSION['User_ID'])) {
         header("Location: Frauds.php");
     } elseif ($role == 'Auditor') {
         header("Location: Audits.php");
+    } elseif ($role == 'Management') {
+        header("Location: My_Stocks.php");
     } else {
-        header("Location: Audits.php"); // Default for admins/managers
+        header("Location: Audits.php"); // Default for admins
     }
     exit();
 }

@@ -109,29 +109,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div id="Company_Fields" class="role-fields">
                     <div class="input-group">
                         <label>Registration Number</label>
-                        <input type="text" name="registration_number" placeholder="e.g. REG-12345">
+                        <input type="text" name="registration_number" placeholder="e.g. REG-556788-BD">
                     </div>
                     <div class="input-group">
                         <label>Sector</label>
-                        <input type="text" name="sector" placeholder="e.g. Technology, Finance">
+                        <input type="text" name="sector" placeholder="e.g. Telecommunications">
                     </div>
                 </div>
 
                 <div id="Institution_Fields" class="role-fields">
                     <div class="input-group">
                         <label>Institution Type</label>
-                        <input type="text" name="institution_type" placeholder="e.g. Bank, Hedge Fund">
+                        <input type="text" name="institution_type" placeholder="e.g. Brokerage">
                     </div>
                     <div class="input-group">
                         <label>License Number</label>
-                        <input type="text" name="license_number" placeholder="e.g. LIC-998877">
+                        <input type="text" name="license_number" placeholder="e.g. LIC-BD-44500">
                     </div>
                 </div>
 
                 <div id="Auditor_Fields" class="role-fields">
                     <div class="input-group">
                         <label>Auditing Firm</label>
-                        <input type="text" name="auditing_firm" placeholder="e.g. Deloitte, KPMG">
+                        <input type="text" name="auditing_firm" placeholder="e.g. Khan Audit & Co.">
                     </div>
                 </div>
 

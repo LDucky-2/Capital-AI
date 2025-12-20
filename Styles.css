@@ -191,6 +191,34 @@ h2,
     border: 1px solid var(--border-color);
     margin-bottom: 30px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    overflow-y: auto;
+    position: relative;
+    transition: max-height 0.3s ease;
+}
+
+/* Dynamic sizing classes */
+.data-table-scroll-wrapper.single-table-view {
+    max-height: 550px;
+    /* ~10-12 entries */
+}
+
+.data-table-scroll-wrapper.multi-table-view {
+    max-height: 300px;
+    /* ~5-6 entries */
+}
+
+/* Custom scrollbar for premium feel */
+.data-table-scroll-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.data-table-scroll-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.data-table-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: var(--accent-gold);
+    border-radius: 10px;
 }
 
 .data-table {
@@ -201,13 +229,43 @@ h2,
 .data-table th {
     background-color: var(--primary-dark);
     color: #fff;
-    /* White text on dark green header */
     text-align: left;
     padding: 12px 15px;
     font-weight: 500;
     text-transform: uppercase;
     font-size: 0.85rem;
     letter-spacing: 1px;
+    cursor: pointer;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    user-select: none;
+}
+
+.data-table th:hover {
+    background-color: var(--primary-accent);
+}
+
+.data-table th::after {
+    content: '\f0dc';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 8px;
+    opacity: 0.3;
+    font-size: 0.7rem;
+}
+
+.data-table th.sort-asc::after {
+    content: '\f0de';
+    opacity: 1;
+    color: var(--accent-gold);
+}
+
+.data-table th.sort-desc::after {
+    content: '\f0dd';
+    opacity: 1;
+    color: var(--accent-gold);
 }
 
 .data-table td {
@@ -318,14 +376,18 @@ h3 {
 
 .btn-action {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 6px 12px;
     background-color: var(--primary-dark);
     color: #fff;
     text-decoration: none;
     font-size: 0.85rem;
-    font-weight: bold;
-    margin-right: 5px;
+    font-weight: 500;
+    margin: 0;
     border: none;
+    min-width: 100px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
 .btn-action:hover {

@@ -2,6 +2,19 @@
 include 'auth_session.php';
 checkLogin();
 include 'Database.php';
+$user_role = $_SESSION['Permission'];
+if ($user_role === 'Fraud Detector') {
+    echo "<div class='content'><div class='alert'>Access Denied. Fraud Detectors do not have access to the Market page.</div></div>";
+    include 'includes/footer.php';
+    exit();
+}
+
+// Block Company Access
+if (hasRole('Company')) {
+    echo "<div class='content'><div class='alert'>Access Denied. Companies are not permitted to view the market list.</div></div>";
+    include 'includes/footer.php';
+    exit();
+}
 
 // Optimized Query
 $sql = "
@@ -21,7 +34,7 @@ $sql = "
 ";
 $Stocks = $conn->query($sql);
 
-$is_investor = hasRole('Investor');
+$is_trader = hasRole(['Investor', 'Management']);
 ?>
 
 <?php include 'includes/header.php'; ?>
@@ -58,15 +71,16 @@ if (isset($_GET['msg'])) {
                     echo "<td>" . htmlspecialchars($row['Company_Name']) . "</td>";
                     echo "<td>" . number_format($row['Available_Shares']) . "</td>";
                     echo "<td>$" . htmlspecialchars($row['Current_Price']) . "</td>";
-                    echo "<td>";
-                    echo "<a href='Stock_Details.php?id=" . $row['Stock_ID'] . "' class='btn-action' style='background:transparent; color:var(--text-main); border:1px solid var(--text-main);'>View Info</a> ";
-                    if ($is_investor) {
+                    echo "<td style='display: flex; gap: 8px; align-items: center;'>";
+                    echo "<a href='Stock_Details.php?id=" . $row['Stock_ID'] . "' class='btn-action' style='background:#28a745; color:white;'>View Info</a> ";
+                    echo "<a href='Price_History.php?id=" . $row['Stock_ID'] . "' class='btn-action' style='background:#28a745; color:white;'>History</a> ";
+                    if ($is_trader) {
                         // Simple form for buying
-                        echo "<form action='stock_action.php' method='POST' style='display:inline-flex; gap:5px;'>";
+                        echo "<form action='stock_action.php' method='POST' style='display:contents;'>";
                         echo "<input type='hidden' name='stock_id' value='" . $row['Stock_ID'] . "'>";
                         echo "<input type='hidden' name='action' value='buy'>";
                         echo "<input type='number' name='amount' placeholder='Qty' min='1' max='" . $row['Available_Shares'] . "' style='width:60px; padding:5px; margin:0; background:#111; border:1px solid #333; color:#fff;' required>";
-                        echo "<button type='submit' class='btn-action'>BUY</button>";
+                        echo "<button type='submit' class='btn-action' style='background:#28a745; color:white; border:none;'>BUY</button>";
                         echo "</form>";
                     }
                     echo "</td>";

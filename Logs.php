@@ -3,6 +3,12 @@ include 'auth_session.php';
 checkLogin();
 include 'Database.php';
 
+$where = "1=1";
+if (isset($_GET['log_id'])) {
+    $log_id = intval($_GET['log_id']);
+    $where = "l.Log_ID = '$log_id'";
+}
+
 $sql = "
     SELECT 
         l.Log_ID, 
@@ -10,6 +16,7 @@ $sql = "
         l.Timestamp, 
         l.Activity_Data_Detail
     FROM Log_T l
+    WHERE $where
     ORDER BY l.Timestamp DESC
 ";
 $Logs = $conn->query($sql);

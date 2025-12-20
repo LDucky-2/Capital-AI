@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // Initialize Price History with starting price
                 $stock_id = $conn->insert_id;
                 $date = date('Y-m-d');
-                $hist_sql = "INSERT INTO Price_History_T (Stock_ID, Date, Open_Price, Close_Price, Volume) 
-                             VALUES ('$stock_id', '$date', '$price', '$price', 0)";
+                $hist_sql = "INSERT INTO Price_History_T (Stock_ID, Date, Open_Price, Close_Price, High, Low, Volume) 
+                             VALUES ('$stock_id', '$date', '$price', '$price', '$price', '$price', 0)";
                 $conn->query($hist_sql);
                 header("Location: My_Company.php?msg=ipo_success");
             } else {
@@ -65,21 +65,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    // === BUY / SELL STOCK (INVESTOR) ===
-    if (($action == 'buy' || $action == 'sell') && hasRole('Investor')) {
+    // === BUY / SELL STOCK (INVESTOR & MANAGEMENT) ===
+    if (($action == 'buy' || $action == 'sell') && hasRole(['Investor', 'Management'])) {
         $stock_id = intval($_POST['stock_id']);
         $amount = intval($_POST['amount']);
+        $user_id = $_SESSION['User_ID'];
         
         if ($amount <= 0) {
             header("Location: Stocks.php?msg=error");
             exit();
         }
 
-        // Check Stock Status
-        $stock_sql = "SELECT Status FROM Stock_T WHERE Stock_ID = '$stock_id'";
+        // 1. Check if Investor is Frozen
+        $user_sql = "SELECT Status FROM User_T WHERE User_ID = '$user_id'";
+        $user_res = $conn->query($user_sql)->fetch_assoc();
+        if ($user_res['Status'] == 'Frozen') {
+            echo "<script>alert('Your account is FROZEN. You cannot perform any transactions.'); window.history.back();</script>";
+            exit();
+        }
+
+        // 2. Check Stock and Company Status
+        $stock_sql = "
+            SELECT s.Status as Stock_Status, u.Status as Company_Status, u.Name as Company_Name
+            FROM Stock_T s
+            JOIN User_T u ON s.Company_User_ID = u.User_ID
+            WHERE s.Stock_ID = '$stock_id'
+        ";
         $stock_res = $conn->query($stock_sql)->fetch_assoc();
         
-        if ($action == 'buy' && $stock_res['Status'] == 'Closed') {
+        if ($stock_res['Company_Status'] == 'Frozen') {
+            echo "<script>alert('Trading for " . addslashes($stock_res['Company_Name']) . " is currently SUSPENDED by the Administrator.'); window.history.back();</script>";
+            exit();
+        }
+
+        if ($action == 'buy' && $stock_res['Stock_Status'] == 'Closed') {
             echo "<script>alert('Trading for this stock is currently CLOSED by the company.'); window.history.back();</script>";
             exit();
         }
@@ -125,6 +144,56 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 VALUES ('$stock_id', '$user_id', '$amount', '$transaction_type', '$log_id')";
 
         if ($conn->query($sql) === TRUE) {
+            // 4. Update Price History Volume
+            // Get current price for history tracking
+            $p_sql = "SELECT Current_Price FROM Stock_T WHERE Stock_ID = '$stock_id'";
+            $p_data = $conn->query($p_sql)->fetch_assoc();
+            $current_price = $p_data['Current_Price'];
+            $today = date('Y-m-d');
+
+            $upsert_hist = "
+                INSERT INTO Price_History_T (Stock_ID, Date, Open_Price, Close_Price, High, Low, Volume)
+                VALUES ('$stock_id', '$today', '$current_price', '$current_price', '$current_price', '$current_price', '$amount')
+                ON DUPLICATE KEY UPDATE 
+                Volume = Volume + $amount,
+                Close_Price = '$current_price',
+                High = GREATEST(High, '$current_price'),
+                Low = LEAST(Low, '$current_price')
+            ";
+            $conn->query($upsert_hist);
+
+            // === DYNAMIC FRAUD DETECTION (Active Oversight) ===
+            $detected_patterns = [];
+            
+            // 1. Pattern: High-Volume Transaction
+            if ($amount > 200) {
+                $detected_patterns[] = ["High-Volume Transaction Alert", min(9.9, $amount / 30)];
+            }
+
+            // 2. Pattern: Rapid High-Value Trading
+            // Check if user has traded > 3 times in the last 24 hours
+            $recent_trades = $conn->query("SELECT COUNT(*) as count FROM Log_T WHERE Activity_Data_Detail LIKE 'User $user_id %' AND Activity_Type IN ('Stock Buy', 'Stock Sell') AND Timestamp > DATE_SUB(NOW(), INTERVAL 24 HOUR)")->fetch_assoc();
+            if ($recent_trades['count'] > 3 && $amount > 50) {
+                $detected_patterns[] = ["Rapid High-Value Trading", 7.5];
+            }
+
+            // 3. Pattern: Reputation Risks (Lore-based Flag)
+            // Flag if the user's name is in the 'Suspicious' list from our seeder
+            $suspicious_names = ['Vekel the Man', 'Tonilia', 'Mallus Maccius', 'Black-Briar Meadery'];
+            $user_info = $conn->query("SELECT Name FROM User_T WHERE User_ID = '$user_id'")->fetch_assoc();
+            if (in_array($user_info['Name'], $suspicious_names)) {
+                $detected_patterns[] = ["Thieves Guild Association Flag", 9.0];
+            }
+
+            // Record all triggered alerts
+            foreach ($detected_patterns as $p) {
+                $p_name = $p[0];
+                $p_risk = $p[1];
+                $fraud_sql = "INSERT INTO Fraud_Alert_T (Targeted_User_ID, Pattern_Detected, Risk_Score, Log_ID) 
+                             VALUES ('$user_id', '$p_name', '$p_risk', '$log_id')";
+                $conn->query($fraud_sql);
+            }
+
             if ($action == 'buy') {
                 header("Location: Stocks.php?msg=bought");
             } else {

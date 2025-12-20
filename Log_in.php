@@ -6,6 +6,9 @@ $message = "";
 if (isset($_GET['signup']) && $_GET['signup'] == 'success') {
     $message = "<div class='alert alert-success'>Account created successfully! Please log in.</div>";
 }
+if (isset($_GET['activation']) && $_GET['activation'] == 'success') {
+    $message = "<div class='alert alert-success'>Account activated successfully! You can now log in.</div>";
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if it's a login attempt
@@ -35,6 +38,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         header("Location: My_Institution.php");
                      } elseif ($row['Permission'] === 'Fraud Detector') {
                         header("Location: Frauds.php");
+                     } elseif ($row['Permission'] === 'Administrator') {
+                        header("Location: Employee_Database.php");
+                     } elseif ($row['Permission'] === 'Management') {
+                        header("Location: My_Stocks.php");
                      } else {
                         header("Location: Audits.php");
                      }
@@ -85,7 +92,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
                 
                 <button type="submit" class="login-button">Log In</button>
-                <a href="Sign_up.php" class="signup-button" style="display: block; text-align: center; text-decoration: none; line-height: normal;">Create new account</a>
+                <a href="Sign_up.php" class="signup-button" style="display: block; text-align: center; text-decoration: none; line-height: normal; margin-bottom: 10px;">Create new account</a>
+                <div style="text-align: center;">
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Internal Staff?</span>
+                    <a href="Activate_Account.php" style="color: var(--primary-color); text-decoration: none; font-size: 0.9rem; font-weight: 500;">Activate Account</a>
+                </div>
             </form>
         </div>
     </div>

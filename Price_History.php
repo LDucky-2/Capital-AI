@@ -1,6 +1,11 @@
 <?php
 include 'auth_session.php';
 checkLogin();
+if ($_SESSION['Permission'] === 'Fraud Detector') {
+    echo "<div class='content'><div class='alert'>Access Denied. Fraud Detectors do not have access to Price History.</div></div>";
+    include 'includes/footer.php';
+    exit();
+}
 include 'Database.php';
 
 if (!isset($_GET['id'])) {
@@ -34,7 +39,7 @@ $history_result = $conn->query($history_sql);
 <?php include 'includes/sidebar.php'; ?>
 
 <div class="page-header">
-    <a href="Stocks.php" class="btn-action" style="float:right; margin-top:5px;">&larr; Back to Market</a>
+    <a href="Stocks.php" class="btn-action" style="float:right; margin-top:5px; background:#28a745; color:white; border:none;">&larr; Back to Market</a>
     <h2>Price History: <?php echo htmlspecialchars($stock['Company_Name']); ?></h2>
 </div>
 

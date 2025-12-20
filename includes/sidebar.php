@@ -1,6 +1,7 @@
 
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
+$role_for_nav = $_SESSION['Permission'] ?? null;
 
 // Define menu items
 // Format: URL => [Label, Icon, Permissions Array (null = public)]
@@ -8,57 +9,62 @@ $menu_items_config = [
     'Audits.php' => [
         'label' => 'Audit Reports', 
         'icon' => 'fas fa-file-contract', 
-        'permissions' => ['Administrator', 'Auditor', 'Management', 'Fraud Detector']
+        'permissions' => ['Auditor']
     ],
     'Stocks.php' => [
         'label' => 'Market', 
         'icon' => 'fas fa-chart-line', 
-        'permissions' => ['Administrator', 'Management', 'Investor', 'Company']
+        'permissions' => ['Administrator', 'Management', 'Investor']
     ],
     'My_Stocks.php' => [
-        'label' => 'My Stocks', 
+        'label' => ($role_for_nav === 'Management' ? 'Company Investments' : 'My Stocks'), 
         'icon' => 'fas fa-wallet', 
-        'permissions' => ['Administrator', 'Management', 'Investor', 'Auditor']
+        'permissions' => ['Investor', 'Management']
     ],
     'Stock_Transactions_and_Trades.php' => [
         'label' => 'Transaction History', 
         'icon' => 'fas fa-exchange-alt', 
-        'permissions' => ['Investor', 'Administrator', 'Management', 'Auditor']
+        'permissions' => ['Investor', 'Institution', 'Management']
     ],
     'Frauds.php' => [
         'label' => 'Fraud Alerts', 
         'icon' => 'fas fa-exclamation-triangle', 
-        'permissions' => ['Fraud Detector', 'Administrator', 'Database Manager', 'Auditor']
+        'permissions' => ['Fraud Detector', 'Administrator']
     ],
     'Predictions.php' => [
         'label' => 'Stock Prediction', 
-        'icon' => 'fas fa-crystal-ball', 
+        'icon' => 'fas fa-brain', 
         'permissions' => ['Administrator', 'Management']
     ],
     'Company_Database.php' => [
         'label' => 'Company Database', 
         'icon' => 'fas fa-building', 
-        'permissions' => ['Administrator', 'Database Manager', 'Management', 'Auditor']
+        'permissions' => ['Administrator', 'Fraud Detector']
+    ],
+    'Auditor_Database.php' => [
+        'label' => 'Auditor Database', 
+        'icon' => 'fas fa-user-check', 
+        'permissions' => ['Administrator']
     ],
     'Employee_Database.php' => [
         'label' => 'Employee Database', 
         'icon' => 'fas fa-users', 
-        'permissions' => ['Administrator', 'Management']
+        'permissions' => ['Administrator']
     ],
     'Investor_Database.php' => [
         'label' => 'Investor Database', 
         'icon' => 'fas fa-user-tie', 
-        'permissions' => ['Administrator', 'Database Manager', 'Management']
+        'permissions' => ['Administrator', 'Fraud Detector']
     ],
     'Institution_Database.php' => [
         'label' => 'Institutions', 
         'icon' => 'fas fa-landmark', 
-        'permissions' => ['Administrator', 'Database Manager', 'Management', 'Institution']
+        'permissions' => ['Administrator', 'Institution', 'Fraud Detector']
     ],
     'Logs.php' => [
         'label' => 'System Logs', 
         'icon' => 'fas fa-history', 
-        'permissions' => ['Administrator', 'Database Manager']
+        'permissions' => ['Administrator', 'Fraud Detector']
     ],
     'My_Company.php' => [
         'label' => 'My Company', 

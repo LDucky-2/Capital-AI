@@ -3,14 +3,20 @@ include 'auth_session.php';
 checkLogin();
 include 'Database.php';
 
-// Ensure user is an investor
-if (!hasRole('Investor')) {
-    echo "<div class='content'><div class='alert'>Access Denied. You are not an Investor.</div></div>";
+// Ensure user is an investor or management
+if (!hasRole(['Investor', 'Management'])) {
+    echo "<div class='content'><div class='alert'>Access Denied. You do not have access to this portfolio view.</div></div>";
     include 'includes/footer.php';
     exit();
 }
 
 $user_id = $_SESSION['User_ID'];
+$role = $_SESSION['Permission'];
+
+// Logic: If Management, show collective portfolio of all managers. If Investor, show personal.
+$where_clause = ($role === 'Management') 
+    ? "t.Investor_User_ID IN (SELECT User_ID FROM User_T WHERE Permission = 'Management')" 
+    : "t.Investor_User_ID = '$user_id'";
 
 // Calculate holdings from transactions
 // Logic: Sum of 'buy' - Sum of 'sell' for each stock
@@ -25,7 +31,7 @@ $sql = "
     JOIN Stock_T s ON t.Stock_ID = s.Stock_ID
     JOIN Company_T c ON s.Company_User_ID = c.Company_User_ID
     JOIN User_T u ON c.Company_User_ID = u.User_ID
-    WHERE t.Investor_User_ID = '$user_id'
+    WHERE $where_clause
     GROUP BY s.Stock_ID, u.Name, s.Current_Price
     HAVING (Total_Bought - Total_Sold) > 0
 ";
@@ -37,7 +43,7 @@ $result = $conn->query($sql);
 <?php include 'includes/sidebar.php'; ?>
 
 <div class="page-header">
-    <h2>My Portfolio</h2>
+    <h2><?php echo ($role === 'Management' ? 'Company Investments' : 'My Portfolio'); ?></h2>
 </div>
 
 <div class="content-section">
@@ -69,14 +75,14 @@ $result = $conn->query($sql);
                     echo "<td>" . number_format($shares_owned) . "</td>";
                     echo "<td>$" . number_format($row['Current_Price'], 2) . "</td>";
                     echo "<td>$" . number_format($total_value, 2) . "</td>";
-                    echo "<td>";
-                    echo "<a href='Stock_Details.php?id=" . $row['Stock_ID'] . "' class='btn-action'>View</a>";
+                    echo "<td style='display: flex; gap: 8px; align-items: center;'>";
+                    echo "<a href='Stock_Details.php?id=" . $row['Stock_ID'] . "' class='btn-action' style='background:#28a745; color:white; border:none;'>View</a>";
                     // Sell Button Form
-                    echo "<form action='stock_action.php' method='POST' style='display:inline-block; margin-left:5px;'>";
+                    echo "<form action='stock_action.php' method='POST' style='display:contents;'>";
                     echo "<input type='hidden' name='stock_id' value='" . $row['Stock_ID'] . "'>";
                     echo "<input type='hidden' name='action' value='sell'>";
                     echo "<input type='number' name='amount' min='1' max='" . $shares_owned . "' placeholder='Qty' style='width:60px; padding:5px;' required>";
-                    echo "<button type='submit' class='btn-action' style='background-color:#d9534f;'>Sell</button>";
+                    echo "<button type='submit' class='btn-action' style='background:#28a745; color:white; border:none;'>Sell</button>";
                     echo "</form>";
                     echo "</td>";
                     echo "</tr>";

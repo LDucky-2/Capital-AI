@@ -17,9 +17,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
             exit();
         }
 
-        // 1. Create Log
+        // 1. Fetch Names and Statuses for both parties
+        $n_sql = "
+            SELECT 
+                (SELECT Name FROM User_T WHERE User_ID = '$user_id') as Buyer_Name, 
+                (SELECT Status FROM User_T WHERE User_ID = '$user_id') as Buyer_Status,
+                (SELECT Name FROM User_T WHERE User_ID = '$seller_id') as Seller_Name,
+                (SELECT Status FROM User_T WHERE User_ID = '$seller_id') as Seller_Status
+        ";
+        $n_res = $conn->query($n_sql);
+        $n_data = $n_res->fetch_assoc();
+        
+        if ($n_data['Buyer_Status'] == 'Frozen') {
+            echo "<script>alert('Your institution is FROZEN by the Administrator. You cannot initiate trades.'); window.history.back();</script>";
+            exit();
+        }
+        
+        if ($n_data['Seller_Status'] == 'Frozen') {
+            echo "<script>alert('The institution \'" . addslashes($n_data['Seller_Name']) . "\' is currently FROZEN. Trading with them is suspended.'); window.history.back();</script>";
+            exit();
+        }
+
+        $buyer_name = $n_data['Buyer_Name'];
+        $seller_name = $n_data['Seller_Name'];
+
+        // 2. Create Log
         $activity_type = "Institutional Trade";
-        $activity_data = "Institution $user_id bought $asset_type from Institution $seller_id";
+        $activity_data = $conn->real_escape_string("Institution '$buyer_name' bought $asset_type from Institution '$seller_name'");
         $timestamp = date('Y-m-d H:i:s');
         
         $log_sql = "INSERT INTO Log_T (Timestamp, Activity_Type, Activity_Data_Detail) VALUES ('$timestamp', '$activity_type', '$activity_data')";

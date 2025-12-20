@@ -3,7 +3,7 @@ include 'auth_session.php';
 checkLogin();
 
 // RESTRICT ACCESS: Only allow specific roles
-$allowed_roles = ['Fraud Detector', 'Administrator', 'Database Manager'];
+$allowed_roles = ['Fraud Detector', 'Administrator'];
 if (!hasRole($allowed_roles)) {
     // Option 1: Redirect to a 'Forbidden' page or Dashboard
     // header("Location: Audits.php?error=access_denied");
@@ -23,7 +23,12 @@ if (!hasRole($allowed_roles)) {
 
 include 'Database.php';
 
-$sql_alerts = "SELECT * FROM fraud_alert_t ORDER BY Alert_ID DESC";
+$sql_alerts = "
+    SELECT a.*, u.Name as User_Name, u.Permission as User_Role 
+    FROM fraud_alert_t a 
+    LEFT JOIN User_T u ON a.Targeted_User_ID = u.User_ID 
+    ORDER BY a.Alert_ID DESC
+";
 $Fraud_Alerts = $conn->query($sql_alerts);
 
 $sql_actions = "SELECT * FROM fraud_action_t ORDER BY Timestamp DESC";
@@ -44,6 +49,7 @@ $Fraud_Actions = $conn->query($sql_actions);
             <thead>
                 <tr>
                     <th>Alert ID</th>
+                    <th>Targeted User</th>
                     <th>Pattern Detected</th>
                     <th>Risk Score</th>
                     <th>False Positive?</th>
@@ -56,10 +62,41 @@ $Fraud_Actions = $conn->query($sql_actions);
                     while($row = $Fraud_Alerts->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['Alert_ID']) . "</td>";
+                        echo "<td>";
+                        if ($row['User_Name']) {
+                            $target_link = "#";
+                            if ($row['User_Role'] == 'Investor') $target_link = "Stock_Transactions_and_Trades.php?investor_id=" . $row['Targeted_User_ID'];
+                            if ($row['User_Role'] == 'Company') $target_link = "Price_History.php?id=" . $row['Targeted_User_ID'];
+                            if ($row['User_Role'] == 'Institution') $target_link = "Stock_Transactions_and_Trades.php?institution_id=" . $row['Targeted_User_ID'];
+                            
+                            echo "<a href='$target_link' style='color: var(--primary); font-weight: 500; text-decoration: none;' title='View Profile'>" . htmlspecialchars($row['User_Name']) . "</a>";
+                        } else {
+                            echo "Unknown";
+                        }
+                        echo "</td>";
                         echo "<td>" . htmlspecialchars($row['Pattern_Detected']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Risk_Score']) . "</td>";
-                        echo "<td>" . ($row['Is_False_Positive'] ? 'Yes' : 'No') . "</td>";
-                        echo "<td>" . htmlspecialchars($row['Log_ID']) . "</td>";
+                        echo "<td>";
+                        $fpStatus = $row['Is_False_Positive'];
+                        $btnLabel = $fpStatus ? "Undo False Positive" : "Mark False Positive";
+                        $btnColor = $fpStatus ? "#6c757d" : "#dc3545";
+                        $newVal = $fpStatus ? 0 : 1;
+                        
+                        echo "<div style='display:flex; align-items:center; gap:10px;'>";
+                        echo "<span>" . ($fpStatus ? 'Yes' : 'No') . "</span>";
+                        echo "<form action='fraud_update_status.php' method='POST' style='margin:0;'>";
+                        echo "<input type='hidden' name='alert_id' value='{$row['Alert_ID']}'>";
+                        echo "<input type='hidden' name='status' value='$newVal'>";
+                        echo "<button type='submit' class='btn-action' style='background:$btnColor; color:white; padding: 2px 8px; font-size: 0.7rem; min-width: auto;'>$btnLabel</button>";
+                        echo "</form>";
+                        echo "</div>";
+                        echo "</td>";
+                        echo "<td>";
+                        echo "<div style='display:flex; gap:5px; align-items:center;'>";
+                        echo "<span>" . htmlspecialchars($row['Log_ID']) . "</span>";
+                        echo "<a href='Logs.php?log_id=" . $row['Log_ID'] . "' class='btn-action' style='background:#28a745; color:white; padding: 2px 8px; font-size: 0.75rem; min-width: auto;' title='View Investigation Log'>Investigate</a>";
+                        echo "</div>";
+                        echo "</td>";
                         echo "</tr>";
                     }
                 } else {
@@ -90,7 +127,14 @@ $Fraud_Actions = $conn->query($sql_actions);
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['Alert_ID']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Action_taken']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['Notes']) . "</td>";
+                        echo "<td>";
+                        echo "<form action='fraud_edit_note.php' method='POST' style='display:flex; gap:5px;'>";
+                        echo "<input type='hidden' name='alert_id' value='{$row['Alert_ID']}'>";
+                        echo "<input type='hidden' name='timestamp' value='{$row['Timestamp']}'>";
+                        echo "<input type='text' name='notes' value='" . htmlspecialchars($row['Notes']) . "' style='flex:1; padding: 2px 5px; font-size: 0.85rem; border: 1px solid #ddd; border-radius: 4px;'>";
+                        echo "<button type='submit' class='btn-action' style='background:transparent; color: var(--primary); padding: 2px; min-width: auto; border:none;' title='Save Note'><i class='fas fa-save'></i> Update</button>";
+                        echo "</form>";
+                        echo "</td>";
                         echo "<td>" . htmlspecialchars($row['Timestamp']) . "</td>";
                         echo "</tr>";
                     }

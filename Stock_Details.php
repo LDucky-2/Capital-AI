@@ -59,7 +59,7 @@ $audit_result = $conn->query($audit_sql);
 <?php include 'includes/sidebar.php'; ?>
 
 <div class="page-header">
-    <a href="Stocks.php" class="btn-action" style="float:right;">&larr; Back to Browse</a>
+    <a href="Stocks.php" class="btn-action" style="float:right; background:#28a745; color:white; border:none;">&larr; Back to Browse</a>
     <h2>Stock Details: <?php echo htmlspecialchars($stock['Company_Name']); ?></h2>
 </div>
 
