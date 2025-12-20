@@ -70,10 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && hasRole(['Administrator', 'Fraud Det
                 }
 
                 if ($alert_id > 0) {
-                    $action_msg = "Account $new_status: $reason";
-                    $notes = $conn->real_escape_string("Status changed to $new_status via User Action.");
+                    $action_type = "Account $new_status";
                     $conn->query("INSERT INTO Fraud_Action_T (Alert_ID, Timestamp, Action_taken, Log_ID, Notes) 
-                                 VALUES ('$alert_id', '$timestamp', '$action_msg', '$log_id', '$notes')");
+                                 VALUES ('$alert_id', '$timestamp', '$action_type', '$log_id', '$reason')");
                 }
             }
             

@@ -265,8 +265,8 @@ foreach ($suspiciousUsers as $sname) {
                 $log_id_action = $conn->insert_id;
                 
                 // 2. Create Fraud_Action_T entry
-                $msg = "Account Frozen for Investigation.";
-                $notes = "Target: " . addslashes($sname);
+                $msg = "Account Frozen";
+                $notes = "Target: " . addslashes($sname) . " - Permanent freeze for market manipulation.";
                 $conn->query("INSERT INTO Fraud_Action_T (Alert_ID, Timestamp, Action_taken, Log_ID, Notes) 
                              VALUES ($aid, '$time', '$msg', $log_id_action, '$notes')");
             }
