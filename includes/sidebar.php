@@ -1,9 +1,14 @@
 
 <?php
+// this sidebar system is much better than what ever the fck i did, 
+// understood all of it
+
 $current_page = basename($_SERVER['PHP_SELF']);
+// this code just applies null if the $_SESSION['Permission'] is not set
 $role_for_nav = $_SESSION['Permission'] ?? null;
 
-// Define menu items
+// the side bar links (the pages a user can access)
+// permissions determine who can see the navbar links in their sidebar
 // Format: URL => [Label, Icon, Permissions Array (null = public)]
 $menu_items_config = [
     'Audits.php' => [
@@ -44,7 +49,7 @@ $menu_items_config = [
     'Auditor_Database.php' => [
         'label' => 'Auditor Database', 
         'icon' => 'fas fa-user-check', 
-        'permissions' => ['Administrator']
+        'permissions' => ['Administrator', 'Fraud Detector'] 
     ],
     'Employee_Database.php' => [
         'label' => 'Employee Database', 
@@ -82,9 +87,11 @@ $menu_items_config = [
 <aside class="sidebar">
     <nav class="nav-menu">
         <ul>
+            <!-- loop through the menu item's permissions -->
             <?php foreach ($menu_items_config as $url => $item): ?>
                 <?php 
                 // Render if no permissions required OR user has role
+                // if the item has no permissions or the hasRole function returns true show the item in side bar
                 if ($item['permissions'] === null || hasRole($item['permissions'])): 
                 ?>
                 <li>
@@ -100,3 +107,10 @@ $menu_items_config = [
 </aside>
 
 <main class="content-area">
+
+
+
+
+
+
+

@@ -3,8 +3,8 @@ include 'auth_session.php';
 checkLogin();
 include 'Database.php';
 
-// Block unauthorized roles
-if (!hasRole(['Administrator'])) {
+// Other than admins and fraud detectors no one can see auditor database
+if (!hasRole(['Administrator'] || ['Fraud Detector'])) {
     echo "<div class='content'><div class='alert'>Access Denied. You do not have permission to view the Auditor Database.</div></div>";
     include 'includes/footer.php';
     exit();
@@ -12,17 +12,13 @@ if (!hasRole(['Administrator'])) {
 
 // Fetch Auditors
 $sql = "
-    SELECT 
-        u.User_ID, 
-        u.Name, 
-        u.Email_Address, 
-        u.Status, 
-        a.Auditing_Firm 
-    FROM User_T u 
-    JOIN Auditor_T a ON u.User_ID = a.Auditor_User_ID 
-    WHERE u.Permission = 'Auditor' 
-    ORDER BY u.Name ASC
-";
+    SELECT U.User_ID, U.Name, U.Email_Address, U.Status, A.Auditing_Firm 
+    FROM User_T U 
+    INNER JOIN Auditor_T A 
+    ON U.User_ID = A.Auditor_User_ID 
+    WHERE U.Permission = 'Auditor' 
+    ORDER BY U.Name ASC";
+
 $Auditors = $conn->query($sql);
 ?>
 
@@ -54,13 +50,13 @@ $Auditors = $conn->query($sql);
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['User_ID']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Name']) . "</td>";
-                        echo "<td><strong>" . htmlspecialchars($row['Auditing_Firm']) . "</strong></td>";
+                        echo "<td>" . htmlspecialchars($row['Auditing_Firm']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Email_Address']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['Status']) . "</td>";
                         echo "<td style='display: flex; gap: 8px; align-items: center;'>";
                         echo "<a href='Audits.php?auditor_id=" . $row['User_ID'] . "' class='btn-action' style='background:#28a745; color:white;'>Audits</a>";
                         
-                        if (hasRole('Administrator')) {
+                        if (hasRole(['Administrator'] || ['Fraud Detector'])) {
                             $isFrozen = ($row['Status'] === 'Frozen');
                             $newStatus = $isFrozen ? 'Active' : 'Frozen';
                             $btnLabel = $isFrozen ? 'Unfreeze' : 'Freeze';
@@ -76,7 +72,8 @@ $Auditors = $conn->query($sql);
                         echo "</td>";
                         echo "</tr>";
                     }
-                } else {
+                } 
+                else {
                     echo "<tr><td colspan='6' style='text-align:center;'>No auditors registered.</td></tr>";
                 }
                 ?>

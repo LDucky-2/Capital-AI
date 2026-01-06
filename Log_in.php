@@ -13,7 +13,8 @@ if (isset($_GET['activation']) && $_GET['activation'] == 'success') {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if it's a login attempt
     if (isset($_POST['login_action'])) {
-        $username = $conn->real_escape_string($_POST['username']); // Treating 'username' as 'Name' or 'Email' based on previous file, but let's check schema. Schema has 'Name' and 'Email_Address'.
+        $username = $conn->real_escape_string($_POST['username']); 
+        // Treating 'username' as 'Name' or 'Email' based on previous file, but let's check schema. Schema has 'Name' and 'Email_Address'.
         // Standard is Email. Let's allow Email.
         $password = $_POST['password'];
 
@@ -26,10 +27,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Verify password (plain text as per earlier decision to match schema varchar(30))
             if ($password === $row['Password']) {
                 if ($row['Status'] === 'Active') {
+                    // session variables set from the query SELECT User_ID, Name, Password, Permission,
                      $_SESSION['User_ID'] = $row['User_ID'];
                      $_SESSION['Name'] = $row['Name'];
                      $_SESSION['Permission'] = $row['Permission'];
-                     
+                     // redirect to their set dashboard
                      if ($row['Permission'] === 'Company') {
                         header("Location: My_Company.php");
                      } elseif ($row['Permission'] === 'Investor') {
@@ -42,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         header("Location: Employee_Database.php");
                      } elseif ($row['Permission'] === 'Management') {
                         header("Location: My_Stocks.php");
-                     } else {
+                     } elseif ($row['Permission'] === 'Auditor') {
                         header("Location: Audits.php");
                      }
                      exit();
@@ -78,7 +80,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             
             <?php echo $message; ?>
-
+            <!--<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" is used to 
+            prevent cross-site scripting attacks and it just sends the form to the same page -->
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <input type="hidden" name="login_action" value="1">
                 <div class="input-group">
@@ -102,3 +105,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </body>
 </html>
+

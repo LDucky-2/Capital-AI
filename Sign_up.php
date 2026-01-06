@@ -84,6 +84,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             <?php echo $message; ?>
 
+            <!--<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" is used to 
+            prevent cross-site scripting attacks and it just sends the form to the same page -->
+
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div class="input-group">
                     <label for="name">Full Name</label>
@@ -97,6 +100,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 <div class="input-group">
                     <label for="role">Role</label>
+                    <!-- this is the select element that will call the 
+                     togglefields function given in the script -->
                     <select id="role" name="role" required onchange="toggleFields()">
                         <option value="Investor">Investor</option>
                         <option value="Company">Company</option>
@@ -149,9 +154,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
-
+    <!-- script for toggling the inputs depending on the type of user the user chose -->
     <script>
         function toggleFields() {
+            // this gets the selected role from the div class input-group's select element with id "role"
             var role = document.getElementById("role").value;
             // Hide all first
             var allFields = document.querySelectorAll('.role-fields');
@@ -162,7 +168,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 inputs.forEach(function(input) { input.required = false; });
             });
 
-            // Show selected
+            //  document.getElementById(role + "_Fields"); produces the id of the div that will be shown 
+            //  based on the selected role
             var selectedDiv = document.getElementById(role + "_Fields");
             if (selectedDiv) {
                 selectedDiv.style.display = 'block';

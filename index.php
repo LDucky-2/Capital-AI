@@ -1,10 +1,10 @@
 <?php
 session_start();
-
-// If the user is logged in, redirect to the main dashboard (Audits.php)
+// understood
+// If the user is logged in, redirect to their set dashboard
 if (isset($_SESSION['User_ID'])) {
     $role = $_SESSION['Permission'];
-    
+    // determine where the user should be taken
     if ($role == 'Investor') {
         header("Location: My_Stocks.php");
     } elseif ($role == 'Company') {
@@ -17,8 +17,8 @@ if (isset($_SESSION['User_ID'])) {
         header("Location: Audits.php");
     } elseif ($role == 'Management') {
         header("Location: My_Stocks.php");
-    } else {
-        header("Location: Audits.php"); // Default for admins
+    } elseif ($role == 'Administrator') {
+        header("Location: Employee_Database.php");
     }
     exit();
 }

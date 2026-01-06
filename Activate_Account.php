@@ -14,28 +14,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
-        
+        // checks if user is active or not
         if ($user['Status'] == 'Active') {
             $message = "<div class='alert alert-warning'>This account is already active. Please <a href='Log_in.php'>Log In</a>.</div>";
-        } elseif ($user['Status'] == 'Inactive') {
-            // Check if email is already taken
+        } 
+        elseif ($user['Status'] == 'Inactive') {
+            // checks if email unique or not
             $check_email = $conn->query("SELECT User_ID FROM User_T WHERE Email_Address = '$email'");
             if ($check_email->num_rows > 0) {
                  $message = "<div class='alert alert-danger'>This email address is already in use.</div>";
-            } else {
-                // Activate account
-                $update = "UPDATE User_T SET Email_Address = '$email', Status = 'Active' WHERE User_ID = '$user_id'";
-                if ($conn->query($update)) {
+            } 
+            else {
+                // sets the status to active and adds the email address to the user table
+                $account_activation = "UPDATE User_T SET Email_Address = '$email', Status = 'Active' WHERE User_ID = '$user_id'";
+                if ($conn->query($account_activation)) {
                     header("Location: Log_in.php?activation=success");
                     exit();
-                } else {
+                }
+                else {
                     $message = "<div class='alert alert-danger'>Error activating account: " . $conn->error . "</div>";
                 }
             }
-        } else {
+        } 
+        else {
             $message = "<div class='alert alert-danger'>Account is " . $user['Status'] . " and cannot be activated manually.</div>";
         }
-    } else {
+    } 
+    else {
         $message = "<div class='alert alert-danger'>Invalid User ID or Password. Please contact your Administrator.</div>";
     }
 }

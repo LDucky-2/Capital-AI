@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && hasRole(['Administrator', 'Fraud Det
 
     // Fetch target user's role to validate permissions
     $check_user = $conn->query("SELECT Permission FROM User_T WHERE User_ID = '$target_user_id'");
+    // checks if the target user exists
     if ($check_user && $check_user->num_rows > 0) {
         $target_data = $check_user->fetch_assoc();
         $target_role = $target_data['Permission'];
@@ -23,8 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && hasRole(['Administrator', 'Fraud Det
             exit();
         }
 
-        // RULE 2: Fraud Detectors can ONLY freeze External Users (Investor, Institution, Company)
-        $external_roles = ['Investor', 'Institution', 'Company'];
+        // RULE 2: Fraud Detectors can ONLY freeze External Users (Investor, Institution, Company, Auditor)
+        // if ($performer_role === 'Fraud Detector' && !in_array($target_role, $external_roles)) this basically saying 
+        // that if the user is who is clicking the freeze button is a fraud detector and the target users role is in the external roles array then returns false,
+        // cuz if its true that would mean you would be given unauthorized_target error
+        $external_roles = ['Investor', 'Institution', 'Company', 'Auditor'];
         if ($performer_role === 'Fraud Detector' && !in_array($target_role, $external_roles)) {
             header("Location: $redirect?error=unauthorized_target");
             exit();
@@ -60,7 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && hasRole(['Administrator', 'Fraud Det
                     $alert_res = $conn->query($find_alert);
                     if ($alert_res && $alert_res->num_rows > 0) {
                         $alert_id = $alert_res->fetch_assoc()['Alert_ID'];
-                    } else {
+                    }
+                    else {
                         // Create a "Manual Oversight" Alert so we have a record in Fraud_Action_T
                         $pattern = "Manual Oversight Investigation";
                         $conn->query("INSERT INTO Fraud_Alert_T (Targeted_User_ID, Pattern_Detected, Risk_Score, Log_ID) 
@@ -78,14 +83,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && hasRole(['Administrator', 'Fraud Det
             
             header("Location: $redirect?msg=status_updated");
             exit();
-        } else {
+        } 
+        else {
             echo "Error: " . $conn->error;
         }
-    } else {
+    } 
+    else {
         header("Location: $redirect?error=user_not_found");
         exit();
     }
-} else {
+} 
+else {
     header("Location: index.php");
 }
 ?>
